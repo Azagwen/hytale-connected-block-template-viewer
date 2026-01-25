@@ -1,0 +1,1 @@
+/// <reference types="./custom_connected_block_template.d.ts"/>

@@ -1,0 +1,401 @@
+{
+  "type": "object",
+  "title": "CustomConnectedBlockTemplateAsset",
+  "definitions": {
+    "ConnectedBlockShape": {
+      "type": "object",
+      "title": "ConnectedBlockShape",
+      "properties": {
+        "PatternsToMatchAnyOf": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "title": "Type Selector",
+            "anyOf": [
+              {
+                "$ref": "common.json#/definitions/CustomConnectedBlockPattern"
+              }
+            ],
+            "hytaleSchemaTypeField": {
+              "property": "Type",
+              "values": [
+                "Custom"
+              ]
+            }
+          }
+        },
+        "FaceTags": {
+          "anyOf": [
+            {
+              "$ref": "common.json#/definitions/ConnectedBlockFaceTags"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "CustomConnectedBlockPattern": {
+      "type": "object",
+      "title": "CustomConnectedBlockPattern",
+      "properties": {
+        "Type": {
+          "type": "string",
+          "markdownDescription": "This field controls the type, it must be set to the constant value \"Custom\" to function as this type.",
+          "const": "Custom"
+        },
+        "TransformRulesToOrientation": {
+          "type": "boolean",
+          "markdownDescription": "If the rules should be transformed to the current orientation of the block.",
+          "default": true
+        },
+        "YawToApplyAddReplacedBlockType": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "title": "Rotation",
+          "markdownDescription": "Apply an additional Yaw to the resulting BlockType represented by this shape. This allows your replacement to be offset from your original placement",
+          "enumDescriptions": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "markdownEnumDescriptions": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "enum": [
+            "None",
+            "Ninety",
+            "OneEighty",
+            "TwoSeventy"
+          ]
+        },
+        "RequireFaceTagsMatchingRoll": {
+          "type": "boolean",
+          "markdownDescription": "Adds Roll comparison to face tag matching in patterns below",
+          "default": false
+        },
+        "AllowedPatternTransformations": {
+          "markdownDescription": "Will create additional generated patterns that are variants of this pattern, but rotated/mirrored/flipped to achieve different results. A common example of this is the Fence, which should its resulting shape based on the rotation of its pattern (fence corner rotates depending on which two sides have the corner fence shape)",
+          "anyOf": [
+            {
+              "default": {
+                "IsCardinallyRotatable": false,
+                "MirrorZ": false,
+                "MirrorX": false
+              },
+              "$ref": "common.json#/definitions/PatternRotationDefinition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "RulesToMatch": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "markdownDescription": "All rules must match in order for the pattern to match",
+          "items": {
+            "$ref": "common.json#/definitions/ConnectedBlockPatternRule"
+          }
+        },
+        "OnlyOnPlacement": {
+          "type": "boolean",
+          "markdownDescription": "If true, this pattern will only be checked when the block is first placed.",
+          "default": false
+        },
+        "OnlyOnUpdate": {
+          "type": "boolean",
+          "markdownDescription": "If true, this pattern will only be checked when the block is updated by neighboring block changes.",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "PatternRotationDefinition": {
+      "type": "object",
+      "title": "PatternRotationDefinition",
+      "properties": {
+        "IsCardinallyRotatable": {
+          "type": "boolean",
+          "default": false
+        },
+        "MirrorZ": {
+          "type": "boolean",
+          "default": false
+        },
+        "MirrorX": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "ConnectedBlockPatternRule": {
+      "type": "object",
+      "title": "ConnectedBlockPatternRule",
+      "markdownDescription": "Queries the face the block was placed against",
+      "properties": {
+        "Position": {
+          "anyOf": [
+            {
+              "default": {
+                "X": 0,
+                "Y": 0,
+                "Z": 0
+              },
+              "$ref": "common.json#/definitions/Vector3i"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "IncludeOrExclude": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "title": "IncludeOrExclude",
+          "enumDescriptions": [
+            "",
+            ""
+          ],
+          "markdownEnumDescriptions": [
+            "",
+            ""
+          ],
+          "enum": [
+            "Include",
+            "Exclude"
+          ]
+        },
+        "PlacementNormals": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string",
+            "title": "AdjacentSide",
+            "enumDescriptions": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "markdownEnumDescriptions": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            "enum": [
+              "Up",
+              "Down",
+              "North",
+              "East",
+              "South",
+              "West"
+            ]
+          }
+        },
+        "FaceTags": {
+          "anyOf": [
+            {
+              "default": {
+                "North": [],
+                "East": [],
+                "South": [],
+                "West": [],
+                "Up": [],
+                "Down": []
+              },
+              "$ref": "common.json#/definitions/ConnectedBlockFaceTags"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "Shapes": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "title": "Set",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "BlockTypes": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "BlockTypeLists": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Vector3i": {
+      "type": "object",
+      "title": "Vector3i",
+      "properties": {
+        "X": {
+          "type": "integer",
+          "default": 0
+        },
+        "Y": {
+          "type": "integer",
+          "default": 0
+        },
+        "Z": {
+          "type": "integer",
+          "default": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "ConnectedBlockFaceTags": {
+      "type": "object",
+      "title": "ConnectedBlockFaceTags",
+      "properties": {
+        "North": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "East": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "South": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "West": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "Up": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "Down": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "Parent": {
+      "type": "string",
+      "markdownDescription": "When set this asset will inherit properties from the named asset.\n\nWhen inheriting from another **CustomConnectedBlockTemplateAsset** most properties will simply be copied from the parent asset to this asset. In the case where both child and parent provide a field the child field will simply replace the value provided by the parent, in the case of nested structures this will apply to the fields within the structure. In some cases the field may decide to act differently, for example: by merging the parent and child fields together.",
+      "hytaleParent": {
+        "type": "CustomConnectedBlockTemplateAsset"
+      }
+    },
+    "Tags": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "title": "Map",
+      "markdownDescription": "Tags are a general way to describe an asset that can be interpreted by other systems in a way they see fit.\n\nFor example you could tag something with a **Material** tag with the values **Solid** and **Stone**, And another single tag **Ore**.\n\nTags will be expanded into a single list of tags automatically. Using the above example with **Material** and **Ore** the end result would be the following list of tags: **Ore**, **Material**, **Solid**, **Stone**, **Material\u003dSolid** and **Material\u003dStone**.",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "DontUpdateAfterInitialPlacement": {
+      "type": "boolean",
+      "markdownDescription": "Default to false. When true, will not update the connected block after initial placement. Neighboring block updates won\u0027t affect this block when true.",
+      "default": false
+    },
+    "ConnectsToOtherMaterials": {
+      "type": "boolean",
+      "markdownDescription": "Defaults to true. If true, the material will connect to other materials of different block type sets, if false, the material will only connect to its own block types within the material",
+      "default": true
+    },
+    "DefaultShape": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "Shapes": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "title": "Map",
+      "additionalProperties": {
+        "$ref": "common.json#/definitions/ConnectedBlockShape"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "CustomConnectedBlockTemplateAsset.json"
+}
