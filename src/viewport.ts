@@ -11,7 +11,7 @@ export class ViewportScene extends THREE.Scene {
     constructor() {
         super();
 
-        let canvas = document.querySelector("#viewport") as HTMLCanvasElement;
+        let canvas = document.getElementById("viewport") as HTMLCanvasElement;
         this.canvas = canvas;
         this.renderer = new THREE.WebGLRenderer( {antialias: true, canvas} );
 

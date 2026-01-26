@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { ViewportScene } from "./viewport";
-import { ViewportPanel } from "./gui";
+import { initControls } from "./gui";
 
 // Face Texture
 const loader = new THREE.TextureLoader();
@@ -65,7 +65,8 @@ function main() {
         makePlane(scene, new THREE.Vector3( 0, 0,  1), new THREE.Vector3(1, 1, 1), 0x8888FF, texture_south, texture),
         makePlane(scene, new THREE.Vector3( 1, 0,  1), new THREE.Vector3(1, 1, 1), 0xFF88FF, texture,       texture)
     ];
-    // const gui = new ViewportPanel();
+    
+    initControls();
 }
 
 main();
