@@ -11,8 +11,8 @@ const color_z_pos = 0x8F8FFF;
 const color_z_neg = 0xFFFF8F;
 
 // Face Texture
-const tex_up = ObjUtils.textTexture("UP");
-const tex_down = ObjUtils.textTexture("DOWN");
+// const tex_up = ObjUtils.textTexture("UP");
+// const tex_down = ObjUtils.textTexture("DOWN");
 const tex_north = ObjUtils.textTexture("NORTH", "#4F4F4F", "#FFFF8F");
 const tex_south = ObjUtils.textTexture("SOUTH", "#4F4F4F", "#8F8FFF");
 const tex_east = ObjUtils.textTexture("EAST", "#4F4F4F", "#FF8F8F");
@@ -63,7 +63,7 @@ const sceneObjects = {
         let realPos = new THREE.Vector3(0, 0.5, 0);
         let obj = this.makeLabelledCube(realPos, upTxt, downTxt, northTxt, southTxt, westTxt, eastTxt);
         let baseCube = ObjUtils.makeCube(realPos, new THREE.Vector3(0.999, 0.999, 0.999), 0xFFFFFF, 0.5);
-        let outlineCube = ObjUtils.makeCube(realPos, new THREE.Vector3(0.999, 0.999, 0.999), 0xFFFFFF, 0.5);
+        // let outlineCube = ObjUtils.makeCube(realPos, new THREE.Vector3(0.999, 0.999, 0.999), 0xFFFFFF, 0.5);
 
         obj.add(baseCube);
         this.faceTagCube = obj;

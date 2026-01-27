@@ -53,8 +53,8 @@ export class Pattern implements CCBTA.Pattern {
 	| "OneEighty"
 	| "TwoSeventy";
   RequireFaceTagsMatchingRoll?: boolean
-  AllowedPatternTransformations?: AllowedPatternTransformations
-  RulesToMatch?: RuleToMatch[]
+//   AllowedPatternTransformations?: AllowedPatternTransformations
+//   RulesToMatch?: RuleToMatch[]
   OnlyOnPlacement?: boolean
   OnlyOnUpdate?: boolean
 	
