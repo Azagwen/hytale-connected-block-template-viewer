@@ -56,22 +56,24 @@ function textTexture(text: string, bgColor: string = "#fff", txtColor: string = 
     return new THREE.CanvasTexture();
 }
 
-function makeCube(position: THREE.Vector3, size: THREE.Vector3, tint: number, tex: THREE.Texture): MeshContainer {
+function makeCube(position: THREE.Vector3, size: THREE.Vector3, tint: number): THREE.Mesh;
+function makeCube(position: THREE.Vector3, size: THREE.Vector3, tint: number, opacity: number): THREE.Mesh;
+function makeCube(position: THREE.Vector3, size: THREE.Vector3, tint: number, opacity: number = 1.0, tex?: THREE.Texture): THREE.Mesh {
     const geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
-    const material = new THREE.MeshPhongMaterial( {color: tint, map: tex} );
+    const material = new THREE.MeshBasicMaterial( {color: tint, map: tex ? tex : null, opacity: opacity, transparent: true} );
     const mesh = new THREE.Mesh(geometry, material);  
 
     mesh.position.x = position.x;
     mesh.position.y = position.y;
     mesh.position.z = position.z;
     
-    return { mesh: mesh, highlighted: false } as MeshContainer;
+    return mesh;
 }
 
-function makePlane(position: THREE.Vector3, rotation: THREE.Vector3, size: THREE.Vector3, tint: number): MeshContainer;
-function makePlane(position: THREE.Vector3, rotation: THREE.Vector3, size: THREE.Vector3, tint: number, tex?: THREE.Texture): MeshContainer;
-function makePlane(position: THREE.Vector3, rotation: THREE.Vector3, size: THREE.Vector3, tint: number, texUpper: THREE.Texture, texLower: THREE.Texture): MeshContainer;
-function makePlane(position: THREE.Vector3, rotation: THREE.Vector3, size: THREE.Vector3, tint: number, texUpper?: THREE.Texture, texLower?: THREE.Texture): MeshContainer {
+function makePlane(rayPickable: boolean, position: THREE.Vector3, rotation: THREE.Vector3, size: THREE.Vector3, tint: number): THREE.Mesh;
+function makePlane(rayPickable: boolean, position: THREE.Vector3, rotation: THREE.Vector3, size: THREE.Vector3, tint: number, tex?: THREE.Texture): THREE.Mesh;
+function makePlane(rayPickable: boolean, position: THREE.Vector3, rotation: THREE.Vector3, size: THREE.Vector3, tint: number, texUpper: THREE.Texture, texLower: THREE.Texture): THREE.Mesh;
+function makePlane(rayPickable: boolean, position: THREE.Vector3, rotation: THREE.Vector3, size: THREE.Vector3, tint: number, texUpper?: THREE.Texture, texLower?: THREE.Texture): THREE.Mesh {
     const doubleFaced = texLower != undefined;
     const geometry = new THREE.PlaneGeometry(size.x, size.y);
     const materialSettings = {
@@ -98,9 +100,13 @@ function makePlane(position: THREE.Vector3, rotation: THREE.Vector3, size: THREE
         const meshLower = new THREE.Mesh(geometry, materialLower);
         meshLower.rotation.y = Math.PI;
         meshUpper.add(meshLower);
+
+        (meshLower as any).rayPickable = rayPickable
     }
+
+    (meshUpper as any).rayPickable = rayPickable
  
-    return { mesh: meshUpper, highlighted: false } as MeshContainer;
+    return meshUpper;
 }
 
 export {

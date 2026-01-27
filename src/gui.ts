@@ -1,22 +1,73 @@
 interface Field {
-    getDom(): HTMLElement
+    element: HTMLElement
+    fieldChangedEvent: CustomEvent;
+    getDom(): HTMLElement,
+    addChangedListener(listenerConsumer: EventListenerOrEventListenerObject): void
+}
+
+class CheckBoxField implements Field {
+    private inputElement: HTMLInputElement;
+    private fakeBoxElement: HTMLSpanElement;
+    private checked: boolean = false;
+    private labels = { off: "", on: ""}
+    element: HTMLLabelElement;
+    fieldChangedEvent = new CustomEvent("checkboxUpdated");
+
+    constructor(off_label?: string, on_label?: string) {
+        this.inputElement = document.createElement("input");
+        this.inputElement.type = "checkbox";
+
+        if (off_label) this.labels.off = off_label;
+        if (on_label) this.labels.on = on_label;
+
+        this.fakeBoxElement = document.createElement("span");
+        this.fakeBoxElement.classList = "checkbox-faker";
+        if (this.labels.off) this.fakeBoxElement.textContent = this.labels.off;
+        
+        this.element = document.createElement("label");
+        this.element.classList = "checkbox-div";
+        this.element.appendChild(this.inputElement);
+        this.element.appendChild(this.fakeBoxElement);
+
+        this.inputElement.addEventListener("change", () => {
+            this.checked = this.inputElement.checked;
+
+            if (this.checked && this.labels.on) {
+                this.fakeBoxElement.textContent = this.labels.on;
+            }
+            else if (this.labels.off) {
+                this.fakeBoxElement.textContent = this.labels.off;
+            }
+
+            this.element.dispatchEvent(this.fieldChangedEvent);
+        });
+    }
+    getDom(): HTMLLabelElement {
+        return this.element;
+    }
+    getCheckedState(): boolean {
+        return this.checked;
+    }
+    addChangedListener(listenerConsumer: EventListenerOrEventListenerObject) {
+        this.element.addEventListener("checkboxUpdated", listenerConsumer);
+    }
 }
 
 class OptionsField implements Field {
     private options: string[];
     private selectedOptions?: string;
-    private selectElement: HTMLSelectElement;
-    private optionPickedEvent = new CustomEvent("optionPicked");
+    element: HTMLSelectElement;
+    fieldChangedEvent = new CustomEvent("optionPicked");
 
     constructor(options: string[]) {
         this.options = options;
-        this.selectElement = document.createElement("select");
+        this.element = document.createElement("select");
 
-        this.selectElement.addEventListener("change", () => this.setSelectedOption());
+        this.element.addEventListener("change", () => this.setSelectedOption());
     }
     getDom(): HTMLSelectElement {
         this.addOptionElements();
-        return this.selectElement;
+        return this.element;
     }
     overwriteOptions(newOptions: string[]) {
         this.options = newOptions;
@@ -32,10 +83,10 @@ class OptionsField implements Field {
             return elem;
         })
 
-        optionElements.forEach((option) => this.selectElement.add(option));
+        optionElements.forEach((option) => this.element.add(option));
     }
     private setSelectedOption() {
-        let options = this.selectElement.selectedOptions;
+        let options = this.element.selectedOptions;
 
         if (options.length) {
             this.selectedOptions = options[0].label;
@@ -46,24 +97,27 @@ class OptionsField implements Field {
         if (this.selectedOptions) return this.selectedOptions;
         return "";
     }
-    addListener(listenerConsumer: EventListenerOrEventListenerObject) {
-        this.selectElement.addEventListener("optionPicked", listenerConsumer);
+    addChangedListener(listenerConsumer: EventListenerOrEventListenerObject) {
+        this.element.addEventListener("optionPicked", listenerConsumer);
     }
     dispatchOptionPicked() {
-        this.selectElement.dispatchEvent(this.optionPickedEvent);
+        this.element.dispatchEvent(this.fieldChangedEvent);
     }
 }
 
 class JsonFileField implements Field {
-    private inputElement: HTMLInputElement;
     private jsonContent?: string;
-    private jsonDeliveredEvent = new CustomEvent("jsonDelivered");
+    element: HTMLInputElement;
+    fieldChangedEvent = new CustomEvent("jsonDelivered");
 
     constructor() {
-        this.inputElement = document.createElement("input");
+        this.element = document.createElement("input");
+        this.element.accept = ".json";
+        this.element.type = "file";
+        this.element.multiple = false;
 
-        this.inputElement.addEventListener("change", () => {
-            let file = this.inputElement.files?.item(0);
+        this.element.addEventListener("change", () => {
+            let file = this.element.files?.item(0);
             let reader = new FileReader();
 
             reader.addEventListener("load", (event) => {
@@ -71,7 +125,7 @@ class JsonFileField implements Field {
 
                 if (typeof bfile === "string") {
                     this.jsonContent = bfile;
-                    this.inputElement.dispatchEvent(this.jsonDeliveredEvent);
+                    this.element.dispatchEvent(this.fieldChangedEvent);
                 }
             });
 
@@ -79,18 +133,14 @@ class JsonFileField implements Field {
         });
     }
     getDom(): HTMLInputElement {
-        this.inputElement.accept = ".json";
-        this.inputElement.type = "file";
-        this.inputElement.multiple = false;
-
-        return this.inputElement;
+        return this.element;
     }
     getJsonContent(): string {
         if (this.jsonContent) return this.jsonContent;
         return "";
     }
-    addListener(listenerConsumer: EventListenerOrEventListenerObject) {
-        this.inputElement.addEventListener("jsonDelivered", listenerConsumer);
+    addChangedListener(listenerConsumer: EventListenerOrEventListenerObject) {
+        this.element.addEventListener("jsonDelivered", listenerConsumer);
     }
 }
 
@@ -101,7 +151,8 @@ const Data = {
     },
     controls: {
         jsonFileField: new JsonFileField(),
-        shapesField: new OptionsField([])
+        shapesField: new OptionsField([]),
+        showPatternsField: new CheckBoxField("Showing: Face Tags", "Showing: Patterns")
     }
 }
 
@@ -115,7 +166,7 @@ function initControls() {
     formContainer?.appendChild(jsonDisplay);
 
     // Setup JSON reading
-    Data.controls.jsonFileField.addListener(() => {
+    Data.controls.jsonFileField.addChangedListener(() => {
         Data.cachedJson.str = Data.controls.jsonFileField.getJsonContent();
         Data.cachedJson.obj = JSON.parse(Data.cachedJson.str);
 
@@ -129,7 +180,7 @@ function initControls() {
     })
 
     // Read shapes trigger
-    Data.controls.shapesField.addListener(() => {
+    Data.controls.shapesField.addChangedListener(() => {
         let shape = Data.controls.shapesField.getPickedOption();
 
         if (Data.cachedJson.obj) {
@@ -137,7 +188,6 @@ function initControls() {
             let shapeObj = shapeData[shape];
             let shapeStr = JSON.stringify(shapeObj, null, 4);
 
-            console.log(shapeStr);
             jsonDisplay.textContent = shapeStr;
         }
     })
@@ -146,6 +196,7 @@ function initControls() {
     let fields = [];
     fields.push(Data.controls.jsonFileField);
     fields.push(Data.controls.shapesField);
+    fields.push(Data.controls.showPatternsField);
     fields.forEach((field) => form.appendChild(field.getDom()));
 }
 

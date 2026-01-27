@@ -1,3 +1,11 @@
+:root {
+   --global-bg: #aaa;
+   --button-bg: #fff;
+   --button-bg-hover: #ccc;
+   --button-bg-pressed: #ddd;
+   --button-bg-pressed-hover: #eee;
+}
+
 html, body {
    margin: 0;
    height: 100%;
@@ -24,6 +32,44 @@ body {
    height: 100%;
    display: flex;
    flex-direction: column;
+   background-color: var(--global-bg);
+}
+
+#controls > form {
+   display: flex;
+   flex-direction: column;
+   padding: 10px 10px 0px 10px;
+}
+
+#controls > form > input {
+   margin-bottom: 10px;
+}
+
+#controls > form > input[type="file"] {
+   background-color: var(--button-bg-hover);
+}
+
+#controls > form > input[type="file"]::file-selector-button {
+   border-radius: 0;
+   border: none;
+   border-right: var(--global-bg) 10px solid;
+   padding: 10px;
+   background-color: var(--button-bg);
+   margin-right: 20px;
+}
+
+#controls > form > select {
+   border-radius: 0;
+   border: none;
+   padding: 10px;
+   background-color: var(--button-bg);
+   margin-bottom: 10px;
+}
+
+#controls > form > select:hover,
+#controls > form > input[type="file"]::file-selector-button:hover
+{
+   background-color: var(--button-bg-hover);
 }
 
 #json_display {
@@ -32,5 +78,39 @@ body {
    margin: 10px;
    padding: 10px;
    white-space: pre-wrap;
-   background-color: #aaa;
+   background-color: var(--button-bg);
+}
+
+.checkbox-div {
+   display: block;
+   position: relative;
+   cursor: pointer;
+   overflow-x: hidden;
+}
+
+.checkbox-div > input[type="checkbox"] {
+   position: absolute;
+   cursor: pointer;
+   opacity: 0;
+   height: 0;
+   width: 0;
+}
+
+.checkbox-faker {
+   display: block;
+   width: 100%;
+   padding: 10px;
+   background-color: var(--button-bg);
+}
+
+.checkbox-div > input[type="checkbox"]:hover ~ .checkbox-faker {  
+   background-color: var(--button-bg-hover);
+}
+
+.checkbox-div > input[type="checkbox"]:checked ~ .checkbox-faker {  
+   background-color: var(--button-bg-pressed);
+}
+
+.checkbox-div > input[type="checkbox"]:checked:hover ~ .checkbox-faker {  
+   background-color: var(--button-bg-pressed-hover);
 }
