@@ -1,14 +1,22 @@
 :root {
+   --global-bg-dark: #666;
    --global-bg: #aaa;
    --button-bg: #fff;
    --button-bg-hover: #ccc;
    --button-bg-pressed: #ddd;
    --button-bg-pressed-hover: #eee;
+
+   --padding-1: 10px;
+   --padding-2: 20px;
+   --padding-4: 40px;
 }
 
 html, body {
    margin: 0;
    height: 100%;
+   display: flex;
+   flex-direction: column;
+   object-fit: contain;
 }
 
 @font-face {
@@ -16,9 +24,18 @@ html, body {
    src: url("/Aza_font.woff");
 }
 
-body {
+h1 {
+   padding: var(--padding-2);
+   margin: 0;
+   font-family:  AzaFont;
+   font-size: larger;
+   color: var(--global-bg-dark);
+}
+
+main {
    display: flex;
    flex-direction: row;
+   height: 100%;
 }
 
 #viewport {
@@ -38,37 +55,55 @@ body {
 #controls > form {
    display: flex;
    flex-direction: column;
-   padding: 10px 10px 0px 10px;
+   padding: var(--padding-1) var(--padding-1) 0px var(--padding-1);
 }
 
 #controls > form > input {
-   margin-bottom: 10px;
+   margin-bottom: var(--padding-1);
 }
 
 #controls > form > input[type="file"] {
-   background-color: var(--button-bg-hover);
+   background-color: var(--button-bg);
 }
 
 #controls > form > input[type="file"]::file-selector-button {
    border-radius: 0;
    border: none;
-   border-right: var(--global-bg) 10px solid;
-   padding: 10px;
+   border-right: var(--global-bg) var(--padding-1) solid;
+   padding: var(--padding-1);
    background-color: var(--button-bg);
-   margin-right: 20px;
+   margin-right: var(--padding-1);
+   border-right: var(--global-bg) solid 1px;
 }
 
-#controls > form > select,
+.select-field-container {
+   background-color: var(--button-bg);
+   margin-bottom: var(--padding-1);
+   display: flex;  
+   align-items: center;
+   padding-left: var(--padding-1);
+}
+
+.select-field-input {
+   background-color: var(--button-bg);
+   border-radius: 0;
+   border: none;
+   padding: var(--padding-1);
+   flex-grow: 1;
+   margin-left: var(--padding-2);
+   border-left: var(--global-bg) solid 1px;
+}
+
 #controls > form > input[type="number"]
 {
    border-radius: 0;
    border: none;
-   padding: 10px;
+   padding: var(--padding-1);
    background-color: var(--button-bg);
-   margin-bottom: 10px;
+   margin-bottom: var(--padding-1);
 }
 
-#controls > form > select:hover,
+.select-field-input:hover,
 #controls > form > input[type="number"]:hover,
 #controls > form > input[type="file"]::file-selector-button:hover
 {
@@ -78,18 +113,18 @@ body {
 #json_display {
    height: 100%;
    overflow-y: scroll;
-   margin: 10px;
-   padding: 10px;
+   margin: var(--padding-1);
+   padding: var(--padding-1);
    white-space: pre-wrap;
    background-color: var(--button-bg);
 }
 
 #json_display_title {
    margin: 0;
-   margin-top: 20px;
-   padding-left: 10px;
-   padding-right: 10px;
-   padding-top: 10px;
+   margin-top: var(--padding-2);
+   padding-left: var(--padding-1);
+   padding-right: var(--padding-1);
+   padding-top: var(--padding-1);
    border-top: #777 solid 2px;
 }
 
@@ -98,7 +133,7 @@ body {
    position: relative;
    cursor: pointer;
    overflow-x: hidden;
-   margin-bottom: 10px;
+   margin-bottom: var(--padding-1);
 }
 
 .checkbox-div > input[type="checkbox"] {
@@ -112,7 +147,7 @@ body {
 .checkbox-faker {
    display: block;
    width: 100%;
-   padding: 10px;
+   padding: var(--padding-1);
    background-color: var(--button-bg);
 }
 
@@ -135,7 +170,7 @@ body {
    flex-direction: row;
    justify-content: space-between;
    align-items: center;
-   padding-left: 10px;
+   padding-left: var(--padding-1);
 }
 
 .number-field > div {
@@ -143,8 +178,8 @@ body {
 }
 
 .number-field > div > button {
-   padding: 10px;
-   width: 40px;
+   padding: var(--padding-1);
+   width: var(--padding-4);
    border-radius: 0;
    border: none;
    background-color: var(--button-bg);
@@ -160,7 +195,7 @@ body {
 }
 
 .number-field > div > input[type="number"] {
-   padding: 10px;
+   padding: var(--padding-1);
    border-radius: 0;
    border: none;
    width: 50px;

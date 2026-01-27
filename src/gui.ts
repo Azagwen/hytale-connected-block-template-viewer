@@ -119,16 +119,22 @@ class CheckBoxField implements Field {
 class OptionsField implements Field {
     private options: string[];
     private selectedOptions?: string;
-    element: HTMLSelectElement;
+    private selectElement: HTMLSelectElement;
+    element: HTMLLabelElement;
     fieldChangedEvent = new CustomEvent("optionPicked");
 
-    constructor(options: string[]) {
+    constructor(label: string, options: string[]) {
         this.options = options;
-        this.element = document.createElement("select");
-
+        this.selectElement = document.createElement("select");
+        this.selectElement.classList = "select-field-input"
+        
+        this.element = document.createElement("label");
+        this.element.textContent = label;
+        this.element.classList = "select-field-container";
+        this.element.appendChild(this.selectElement);
         this.element.addEventListener("change", () => this.setSelectedOption());
     }
-    getDom(): HTMLSelectElement {
+    getDom(): HTMLLabelElement {
         this.addOptionElements();
         return this.element;
     }
@@ -146,10 +152,10 @@ class OptionsField implements Field {
             return elem;
         })
 
-        optionElements.forEach((option) => this.element.add(option));
+        optionElements.forEach((option) => this.selectElement.add(option));
     }
     private setSelectedOption() {
-        let options = this.element.selectedOptions;
+        let options = this.selectElement.selectedOptions;
 
         if (options.length) {
             this.selectedOptions = options[0].label;
@@ -214,7 +220,7 @@ const Data = {
     },
     controls: {
         jsonFileField: new JsonFileField(),
-        shapesField: new OptionsField([]),
+        shapesField: new OptionsField("Shape Selector", []),
         showPatternsField: new CheckBoxField("Showing: Face Tags", "Showing: Patterns"),
         patternIndex: new NumberField("Pattern Index")
     }
