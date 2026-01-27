@@ -3,6 +3,11 @@ html, body {
    height: 100%;
 }
 
+@font-face {
+   font-family: "AzaFont";
+   src: url("../public/Aza_font.woff");
+}
+
 body {
    display: flex;
    flex-direction: row;
@@ -17,5 +22,15 @@ body {
 #controls {
    width: 25vw;
    height: 100%;
-   display: block;
+   display: flex;
+   flex-direction: column;
+}
+
+#json_display {
+   height: 100%;
+   overflow-y: scroll;
+   margin: 10px;
+   padding: 10px;
+   white-space: pre-wrap;
+   background-color: #aaa;
 }

@@ -4,11 +4,15 @@ interface Field {
 
 class OptionsField implements Field {
     private options: string[];
+    private selectedOptions?: string;
     private selectElement: HTMLSelectElement;
+    private optionPickedEvent = new CustomEvent("optionPicked");
 
     constructor(options: string[]) {
         this.options = options;
         this.selectElement = document.createElement("select");
+
+        this.selectElement.addEventListener("change", () => this.setSelectedOption());
     }
     getDom(): HTMLSelectElement {
         this.addOptionElements();
@@ -17,6 +21,8 @@ class OptionsField implements Field {
     overwriteOptions(newOptions: string[]) {
         this.options = newOptions;
         this.addOptionElements();
+
+        if (!this.selectedOptions) this.setSelectedOption();
     }
     private addOptionElements() {
         let optionElements: HTMLOptionElement[] = this.options.map((value) => {
@@ -28,10 +34,28 @@ class OptionsField implements Field {
 
         optionElements.forEach((option) => this.selectElement.add(option));
     }
+    private setSelectedOption() {
+        let options = this.selectElement.selectedOptions;
+
+        if (options.length) {
+            this.selectedOptions = options[0].label;
+            this.dispatchOptionPicked();
+        }
+    }
+    getPickedOption(): string {
+        if (this.selectedOptions) return this.selectedOptions;
+        return "";
+    }
+    addListener(listenerConsumer: EventListenerOrEventListenerObject) {
+        this.selectElement.addEventListener("optionPicked", listenerConsumer);
+    }
+    dispatchOptionPicked() {
+        this.selectElement.dispatchEvent(this.optionPickedEvent);
+    }
 }
 
 class JsonFileField implements Field {
-    inputElement: HTMLInputElement;
+    private inputElement: HTMLInputElement;
     private jsonContent?: string;
     private jsonDeliveredEvent = new CustomEvent("jsonDelivered");
 
@@ -39,7 +63,7 @@ class JsonFileField implements Field {
         this.inputElement = document.createElement("input");
 
         this.inputElement.addEventListener("change", () => {
-            let file = this.getFile();
+            let file = this.inputElement.files?.item(0);
             let reader = new FileReader();
 
             reader.addEventListener("load", (event) => {
@@ -61,41 +85,66 @@ class JsonFileField implements Field {
 
         return this.inputElement;
     }
-    getFile() {
-        return this.inputElement.files?.item(0);
-    }
     getJsonContent(): string {
-        if (this.jsonContent) {
-            return this.jsonContent;
-        }
-
+        if (this.jsonContent) return this.jsonContent;
         return "";
+    }
+    addListener(listenerConsumer: EventListenerOrEventListenerObject) {
+        this.inputElement.addEventListener("jsonDelivered", listenerConsumer);
+    }
+}
+
+export const Data = {
+    cachedJson: {
+        str: "",
+        obj: undefined
+    },
+    controls: {
+        jsonFileField: new JsonFileField(),
+        shapesField: new OptionsField([])
     }
 }
 
 export function initControls() {
     let formContainer = document.getElementById("controls");
     let form = document.createElement("form");
-    let json: any = undefined;
-    formContainer?.appendChild(form);
+    let jsonDisplay = document.createElement("div");
 
-    // Fields that we need to access
-    let jsonFileField = new JsonFileField();
-    let shapesField = new OptionsField([]);
+    jsonDisplay.id = "json_display";
+    formContainer?.appendChild(form);
+    formContainer?.appendChild(jsonDisplay);
 
     // Setup JSON reading
-    jsonFileField.inputElement.addEventListener("jsonDelivered", () => {
-        json = JSON.parse(jsonFileField.getJsonContent());
-        console.log(json);
+    Data.controls.jsonFileField.addListener(() => {
+        Data.cachedJson.str = Data.controls.jsonFileField.getJsonContent();
+        Data.cachedJson.obj = JSON.parse(Data.cachedJson.str);
 
-        let keys: string[] = [];
-        for (let key in json["Shapes"]) keys.push(key);
-        shapesField.overwriteOptions(keys);
+        if (Data.cachedJson.obj) {
+            let shapeData = Data.cachedJson.obj["Shapes"] as any;
+            let keys: string[] = [];
+            
+            for (let key in shapeData) keys.push(key);
+            Data.controls.shapesField.overwriteOptions(keys);
+        }
+    })
+
+    // Read shapes trigger
+    Data.controls.shapesField.addListener(() => {
+        let shape = Data.controls.shapesField.getPickedOption();
+
+        if (Data.cachedJson.obj) {
+            let shapeData = Data.cachedJson.obj["Shapes"] as any;
+            let shapeObj = shapeData[shape];
+            let shapeStr = JSON.stringify(shapeObj, null, 4);
+
+            console.log(shapeStr);
+            jsonDisplay.textContent = shapeStr;
+        }
     })
 
     // Add fields to panel
     let fields = [];
-    fields.push(jsonFileField);
-    fields.push(shapesField);
+    fields.push(Data.controls.jsonFileField);
+    fields.push(Data.controls.shapesField);
     fields.forEach((field) => form.appendChild(field.getDom()));
 }
