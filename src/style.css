@@ -13,7 +13,7 @@ html, body {
 
 @font-face {
    font-family: "AzaFont";
-   src: url("../public/Aza_font.woff");
+   src: url("/Aza_font.woff");
 }
 
 body {
@@ -58,7 +58,9 @@ body {
    margin-right: 20px;
 }
 
-#controls > form > select {
+#controls > form > select,
+#controls > form > input[type="number"]
+{
    border-radius: 0;
    border: none;
    padding: 10px;
@@ -67,6 +69,7 @@ body {
 }
 
 #controls > form > select:hover,
+#controls > form > input[type="number"]:hover,
 #controls > form > input[type="file"]::file-selector-button:hover
 {
    background-color: var(--button-bg-hover);
@@ -81,11 +84,21 @@ body {
    background-color: var(--button-bg);
 }
 
+#json_display_title {
+   margin: 0;
+   margin-top: 20px;
+   padding-left: 10px;
+   padding-right: 10px;
+   padding-top: 10px;
+   border-top: #777 solid 2px;
+}
+
 .checkbox-div {
    display: block;
    position: relative;
    cursor: pointer;
    overflow-x: hidden;
+   margin-bottom: 10px;
 }
 
 .checkbox-div > input[type="checkbox"] {
@@ -113,4 +126,60 @@ body {
 
 .checkbox-div > input[type="checkbox"]:checked:hover ~ .checkbox-faker {  
    background-color: var(--button-bg-pressed-hover);
+}
+
+.number-field {
+   margin: 0;
+   background-color: var(--button-bg);
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   align-items: center;
+   padding-left: 10px;
+}
+
+.number-field > div {
+   height: 100%;
+}
+
+.number-field > div > button {
+   padding: 10px;
+   width: 40px;
+   border-radius: 0;
+   border: none;
+   background-color: var(--button-bg);
+   border-left: var(--global-bg) solid 1px;
+}
+
+.number-field > div > button:hover {
+   background-color: var(--button-bg-hover);
+}
+
+.number-field > div > button:active {
+   background-color: var(--button-bg-pressed);
+}
+
+.number-field > div > input[type="number"] {
+   padding: 10px;
+   border-radius: 0;
+   border: none;
+   width: 50px;
+   border-left: var(--global-bg) solid 1px;
+   -moz-appearance: textfield; 
+}
+
+.number-field > div > input[type="number"]:hover {
+   background-color: var(--button-bg-hover);
+}
+
+.number-field > div > input[type="number"]:focus-visible {
+   outline: none;
+   background-color: var(--button-bg-pressed);
+}
+
+.number-field > div > input[type=number]::-webkit-inner-spin-button,
+.number-field > div > input[type=number]::-webkit-outer-spin-button
+{
+  -webkit-appearance: none;
+  margin: 0;
 }

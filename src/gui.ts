@@ -4,6 +4,69 @@ interface Field {
     getDom(): HTMLElement,
     addChangedListener(listenerConsumer: EventListenerOrEventListenerObject): void
 }
+class NumberField implements Field {
+    private inputElement: HTMLInputElement;
+    private incrementButtonElement: HTMLButtonElement;
+    private decrementButtonElement: HTMLButtonElement;
+    private fieldContainer: HTMLDivElement;
+    private value: number = 0;
+    element: HTMLParagraphElement;
+    fieldChangedEvent = new CustomEvent("valueChanged");
+
+    constructor(label: string) {
+        this.inputElement = document.createElement("input");
+        this.inputElement.type = "number";
+        this.inputElement.value = "0";
+        this.inputElement.min = "0";
+
+        let consumer = (amount: number) => {
+            let max = Number(this.inputElement.max);
+            let min = Number(this.inputElement.min);
+
+            this.value = Number(this.inputElement.value) + amount;
+            this.value = Math.min(max, Math.max(this.value, min))
+            this.inputElement.value = `${this.value}`;
+            this.element.dispatchEvent(this.fieldChangedEvent);
+        }
+
+        this.incrementButtonElement = document.createElement("button");
+        this.incrementButtonElement.textContent = "+";
+        this.incrementButtonElement.type = "button";
+        this.incrementButtonElement.onclick = () => consumer(1);
+
+        this.decrementButtonElement = document.createElement("button");
+        this.decrementButtonElement.textContent = "-";
+        this.decrementButtonElement.type = "button";
+        this.decrementButtonElement.onclick = () => consumer(-1);
+
+        this.fieldContainer = document.createElement("div");
+        this.fieldContainer.appendChild(this.decrementButtonElement);
+        this.fieldContainer.appendChild(this.inputElement);
+        this.fieldContainer.appendChild(this.incrementButtonElement);
+
+        this.element = document.createElement("p");
+        this.element.textContent = label;
+        this.element.classList = "number-field"
+        this.element.appendChild(this.fieldContainer);
+
+        this.inputElement.addEventListener("change", () => {
+            this.value = Number(this.inputElement.value);
+            this.element.dispatchEvent(this.fieldChangedEvent);
+        });
+    }
+    getDom(): HTMLParagraphElement {
+        return this.element;
+    }
+    setMax(value: number) {
+        this.inputElement.max = `${value}`;
+    }
+    getValue(): number {
+        return this.value;
+    }
+    addChangedListener(listenerConsumer: EventListenerOrEventListenerObject) {
+        this.element.addEventListener("valueChanged", listenerConsumer);
+    }
+}
 
 class CheckBoxField implements Field {
     private inputElement: HTMLInputElement;
@@ -152,17 +215,22 @@ const Data = {
     controls: {
         jsonFileField: new JsonFileField(),
         shapesField: new OptionsField([]),
-        showPatternsField: new CheckBoxField("Showing: Face Tags", "Showing: Patterns")
+        showPatternsField: new CheckBoxField("Showing: Face Tags", "Showing: Patterns"),
+        patternIndex: new NumberField("Pattern Index")
     }
 }
 
 function initControls() {
     let formContainer = document.getElementById("controls");
     let form = document.createElement("form");
+    let jsonDisplayTitle = document.createElement("p");
     let jsonDisplay = document.createElement("div");
 
+    jsonDisplayTitle.textContent = "Shape JSON";
+    jsonDisplayTitle.id = "json_display_title";
     jsonDisplay.id = "json_display";
     formContainer?.appendChild(form);
+    formContainer?.appendChild(jsonDisplayTitle);
     formContainer?.appendChild(jsonDisplay);
 
     // Setup JSON reading
@@ -197,6 +265,7 @@ function initControls() {
     fields.push(Data.controls.jsonFileField);
     fields.push(Data.controls.shapesField);
     fields.push(Data.controls.showPatternsField);
+    fields.push(Data.controls.patternIndex);
     fields.forEach((field) => form.appendChild(field.getDom()));
 }
 

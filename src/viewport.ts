@@ -63,6 +63,7 @@ const sceneObjects = {
         let realPos = new THREE.Vector3(0, 0.5, 0);
         let obj = this.makeLabelledCube(realPos, upTxt, downTxt, northTxt, southTxt, westTxt, eastTxt);
         let baseCube = ObjUtils.makeCube(realPos, new THREE.Vector3(0.999, 0.999, 0.999), 0xFFFFFF, 0.5);
+        let outlineCube = ObjUtils.makeCube(realPos, new THREE.Vector3(0.999, 0.999, 0.999), 0xFFFFFF, 0.5);
 
         obj.add(baseCube);
         this.faceTagCube = obj;
@@ -116,18 +117,19 @@ class ViewportScene extends THREE.Scene {
         let canvas = document.getElementById("viewport") as HTMLCanvasElement;
         this.canvas = canvas;
         this.renderer = new THREE.WebGLRenderer( {antialias: true, canvas} );
+        this.renderer.setClearColor(0x777777);
 
         // Camera setup
         let camParams = { size: 1, near: 0.1, far: 50 };
         this.camera = new THREE.OrthographicCamera(-camParams.size, camParams.size, camParams.size, -camParams.size, camParams.near, camParams.far);
         this.camera.position.x = -2;
-        this.camera.position.y = 2;
+        this.camera.position.y = 2.5;
         this.camera.position.z = 2;
-        this.camera.zoom = 0.2;
-        
+        this.camera.zoom = 0.4;
+
         // Controls setup
         this.controls = new OrbitControls(this.camera, this.canvas);
-        this.controls.target.set(0, 1, 0);
+        this.controls.target.set(0, 0.5, 0);
         this.controls.enablePan = false;
         this.controls.update();
     
