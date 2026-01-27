@@ -1,7 +1,8 @@
 import * as THREE from "three";
+import * as ObjUtils from "./object_utils.ts";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 
-export class ViewportScene extends THREE.Scene {
+class ViewportScene extends THREE.Scene {
     canvas: HTMLCanvasElement;
     renderer: THREE.WebGLRenderer;
     pickHelper = new PickHelper();
@@ -125,4 +126,81 @@ class PickHelper {
             y: (event.clientY - rect.top ) * canvas.height / rect.height,
         };
     }
+}
+
+// colors
+const color_x_pos = 0xFF8F8F;
+const color_x_neg = 0x8FFFFF;
+const color_y_pos = 0x8FFF8F;
+const color_y_neg = 0xFF8FFF;
+const color_z_pos = 0x8F8FFF;
+const color_z_neg = 0xFFFF8F;
+
+// Face Texture
+const tex_up = ObjUtils.textTexture("UP");
+const tex_down = ObjUtils.textTexture("DOWN");
+const tex_north = ObjUtils.textTexture("NORTH", "#4F4F4F", "#FFFF8F");
+const tex_south = ObjUtils.textTexture("SOUTH", "#4F4F4F", "#8F8FFF");
+const tex_east = ObjUtils.textTexture("EAST", "#4F4F4F", "#FF8F8F");
+const tex_west = ObjUtils.textTexture("WEST", "#4F4F4F", "#8FFFFF");
+
+const sceneObjects = {
+    floorPlanes: new Array<ObjUtils.MeshContainer>(),
+    faceTagCube: undefined as THREE.Object3D | undefined,
+    makeFaceTagCube: function(upTxt: string | null, downTxt: string | null, northTxt: string | null, southTxt: string | null, westTxt: string | null, eastTxt: string | null) {
+        let size = new THREE.Vector3(1, 1, 1);
+        let r1 = Math.PI / 2;
+        let r2 = r1 * 2;
+        let pp = 0.5; 
+        let pn = -pp;
+
+        let containerObj = new THREE.Object3D();
+        let addPlane = function(position: THREE.Vector3, rotation: THREE.Vector3, color: number, text: string | null) {
+            if (text) {
+                let texture = ObjUtils.textTexture(text);
+                let plane = ObjUtils.makePlane(position, rotation, size, color, texture, texture);
+                containerObj.add(plane.mesh);
+            }
+        }
+
+        addPlane(new THREE.Vector3(0, pp + 0.5,  0), new THREE.Vector3(-r1,   0, 0), color_y_pos, upTxt);
+        addPlane(new THREE.Vector3(0, pn + 0.5,  0), new THREE.Vector3( r1,   0, 0), color_y_neg, downTxt);
+        addPlane(new THREE.Vector3(0,      0.5, pn), new THREE.Vector3(  0,  r2, 0), color_z_neg, northTxt);
+        addPlane(new THREE.Vector3(0,      0.5, pp), new THREE.Vector3(  0,   0, 0), color_z_pos, southTxt);
+        addPlane(new THREE.Vector3(pp,     0.5,  0), new THREE.Vector3(  0,  r1, 0), color_x_pos, eastTxt);
+        addPlane(new THREE.Vector3(pn,     0.5,  0), new THREE.Vector3(  0, -r1, 0), color_x_neg, westTxt);
+        
+        
+        this.faceTagCube = containerObj;
+    },
+    makeFloorPlanes: function() {
+        let size = new THREE.Vector3(1, 1, 1);
+        let rotation = new THREE.Vector3(-Math.PI / 2, 0, 0);
+
+        this.floorPlanes.push(
+            ObjUtils.makePlane(new THREE.Vector3( 0, 0, -1), rotation, size, 0xFFFFFF, tex_north, tex_north),
+            ObjUtils.makePlane(new THREE.Vector3( 0, 0,  1), rotation, size, 0xFFFFFF, tex_south, tex_south),
+            ObjUtils.makePlane(new THREE.Vector3(-1, 0,  0), rotation, size, 0xFFFFFF, tex_west, tex_west),
+            ObjUtils.makePlane(new THREE.Vector3( 1, 0,  0), rotation, size, 0xFFFFFF, tex_east, tex_east),
+            ObjUtils.makePlane(new THREE.Vector3(-1, 0, -1), rotation, size, 0x4F4F4F),
+            ObjUtils.makePlane(new THREE.Vector3( 1, 0, -1), rotation, size, 0x4F4F4F),
+            ObjUtils.makePlane(new THREE.Vector3( 0, 0,  0), rotation, size, 0x4F4F4F),
+            ObjUtils.makePlane(new THREE.Vector3(-1, 0,  1), rotation, size, 0x4F4F4F),
+            ObjUtils.makePlane(new THREE.Vector3( 1, 0,  1), rotation, size, 0x4F4F4F)
+            // ObjUtils.makePlane(new THREE.Vector3(-1, 0, -1), rotation, size, 0x7FFF7F),
+            // ObjUtils.makePlane(new THREE.Vector3( 1, 0, -1), rotation, size, 0xFFBF7F),
+            // ObjUtils.makePlane(new THREE.Vector3( 0, 0,  0), rotation, size, 0x8F8F8F),
+            // ObjUtils.makePlane(new THREE.Vector3(-1, 0,  1), rotation, size, 0x7FbFFF),
+            // ObjUtils.makePlane(new THREE.Vector3( 1, 0,  1), rotation, size, 0xFF7FFF)
+        );
+    },
+    setupScene: function(scene: THREE.Scene) {
+        this.makeFloorPlanes();
+        scene.add(...this.floorPlanes.map((obj) => obj.mesh));
+    }
+}
+
+export {
+    ViewportScene,
+    sceneObjects
 }

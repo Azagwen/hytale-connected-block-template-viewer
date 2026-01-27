@@ -94,7 +94,7 @@ class JsonFileField implements Field {
     }
 }
 
-export const Data = {
+const Data = {
     cachedJson: {
         str: "",
         obj: undefined
@@ -105,7 +105,7 @@ export const Data = {
     }
 }
 
-export function initControls() {
+function initControls() {
     let formContainer = document.getElementById("controls");
     let form = document.createElement("form");
     let jsonDisplay = document.createElement("div");
@@ -147,4 +147,9 @@ export function initControls() {
     fields.push(Data.controls.jsonFileField);
     fields.push(Data.controls.shapesField);
     fields.forEach((field) => form.appendChild(field.getDom()));
+}
+
+export {
+    initControls,
+    Data
 }
