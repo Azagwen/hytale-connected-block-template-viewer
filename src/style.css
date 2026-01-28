@@ -9,6 +9,8 @@
    --padding-1: 10px;
    --padding-2: 20px;
    --padding-4: 40px;
+
+   --button-height: 5vh;
 }
 
 html, body {
@@ -79,11 +81,13 @@ main {
    margin-bottom: var(--padding-1);
 }
 
-#controls > form > input[type="file"] {
+.json-input-field {
    background-color: var(--button-bg);
 }
 
-#controls > form > input[type="file"]::file-selector-button {
+.json-input-field::file-selector-button {
+   height: 100%;
+   width: 25%;
    border-radius: 0;
    border: none;
    border-right: var(--global-bg) var(--padding-1) solid;
@@ -93,16 +97,21 @@ main {
    border-right: var(--global-bg) solid 1px;
 }
 
-.select-field-container {
+.field {
+   height: var(--button-height);
    background-color: var(--button-bg);
    margin-bottom: var(--padding-1);
+}
+
+.select-field {
    display: flex;  
    align-items: center;
    padding-left: var(--padding-1);
+   justify-content: space-between;
 }
 
 .select-field-input {
-   background-color: var(--button-bg);
+   height: 100%;
    border-radius: 0;
    border: none;
    padding: var(--padding-1);
@@ -111,18 +120,11 @@ main {
    border-left: var(--global-bg) solid 1px;
 }
 
-#controls > form > input[type="number"]
-{
-   border-radius: 0;
-   border: none;
-   padding: var(--padding-1);
-   background-color: var(--button-bg);
-   margin-bottom: var(--padding-1);
-}
-
 .select-field-input:hover,
-#controls > form > input[type="number"]:hover,
-#controls > form > input[type="file"]::file-selector-button:hover
+.number-field > div > button:hover ,
+.json-input-field::file-selector-button:hover,
+.number-field > div > input[type="number"]:hover,
+.checkbox-field > input[type="checkbox"]:hover ~ .checkbox-faker
 {
    background-color: var(--button-bg-hover);
 }
@@ -145,15 +147,14 @@ main {
    border-top: #777 solid 2px;
 }
 
-.checkbox-div {
+.checkbox-field {
    display: block;
    position: relative;
    cursor: pointer;
    overflow-x: hidden;
-   margin-bottom: var(--padding-1);
 }
 
-.checkbox-div > input[type="checkbox"] {
+.checkbox-field > input[type="checkbox"] {
    position: absolute;
    cursor: pointer;
    opacity: 0;
@@ -168,43 +169,40 @@ main {
    background-color: var(--button-bg);
 }
 
-.checkbox-div > input[type="checkbox"]:hover ~ .checkbox-faker {  
-   background-color: var(--button-bg-hover);
-}
-
-.checkbox-div > input[type="checkbox"]:checked ~ .checkbox-faker {  
+.checkbox-field > input[type="checkbox"]:checked ~ .checkbox-faker {  
    background-color: var(--button-bg-pressed);
 }
 
-.checkbox-div > input[type="checkbox"]:checked:hover ~ .checkbox-faker {  
+.checkbox-field > input[type="checkbox"]:checked:hover ~ .checkbox-faker {  
    background-color: var(--button-bg-pressed-hover);
 }
 
 .number-field {
    margin: 0;
-   background-color: var(--button-bg);
    display: flex;
    flex-direction: row;
    justify-content: space-between;
    align-items: center;
-   padding-left: var(--padding-1);
 }
 
 .number-field > div {
+   display: flex;
+   justify-content: stretch;
    height: 100%;
+   width: 50%;
+}
+
+.number-field > label {
+   flex-grow: 1;
+   padding-left: var(--padding-1);
 }
 
 .number-field > div > button {
-   padding: var(--padding-1);
-   width: var(--padding-4);
+   width: 50%;
    border-radius: 0;
    border: none;
    background-color: var(--button-bg);
    border-left: var(--global-bg) solid 1px;
-}
-
-.number-field > div > button:hover {
-   background-color: var(--button-bg-hover);
 }
 
 .number-field > div > button:active {
@@ -215,13 +213,9 @@ main {
    padding: var(--padding-1);
    border-radius: 0;
    border: none;
-   width: 50px;
+   width: 100%;
    border-left: var(--global-bg) solid 1px;
    -moz-appearance: textfield; 
-}
-
-.number-field > div > input[type="number"]:hover {
-   background-color: var(--button-bg-hover);
 }
 
 .number-field > div > input[type="number"]:focus-visible {

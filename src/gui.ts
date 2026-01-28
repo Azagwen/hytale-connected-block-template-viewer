@@ -1,61 +1,75 @@
-interface Field {
-    element: HTMLElement
-    fieldChangedEvent: CustomEvent;
-    getDom(): HTMLElement,
-    addChangedListener(listenerConsumer: EventListenerOrEventListenerObject): void
+
+abstract class AbstractField {
+    private eventName: string;
+    element: HTMLElement;
+    fieldChangedEvent: CustomEvent<any>;
+
+    constructor(eventName: string, className: string) {
+        this.eventName = eventName;
+        this.fieldChangedEvent = new CustomEvent(this.eventName);
+        this.element = document.createElement("div");
+        this.element.classList = `field ${className}`;
+    }
+    getDom(): HTMLElement {
+        return this.element;
+    }
+    addChangedListener(listenerConsumer: EventListenerOrEventListenerObject): void {
+        this.element.addEventListener(this.eventName, listenerConsumer);
+    }
+
 }
-class NumberField implements Field {
+
+class NumberField extends AbstractField {
     private inputElement: HTMLInputElement;
     private incrementButtonElement: HTMLButtonElement;
     private decrementButtonElement: HTMLButtonElement;
-    private fieldContainer: HTMLDivElement;
+    private fieldContainerElement: HTMLDivElement;
+    private titleElement: HTMLLabelElement;
     private value: number = 0;
-    element: HTMLParagraphElement;
-    fieldChangedEvent = new CustomEvent("valueChanged");
 
     constructor(label: string) {
+        super("valueChanged", "number-field");
+        
+        this.titleElement = document.createElement("label");
+        this.titleElement.textContent = label;
+
         this.inputElement = document.createElement("input");
         this.inputElement.type = "number";
         this.inputElement.value = "0";
         this.inputElement.min = "0";
 
-        let consumer = (amount: number) => {
-            let max = Number(this.inputElement.max);
-            let min = Number(this.inputElement.min);
-
-            this.value = Number(this.inputElement.value) + amount;
-            this.value = Math.min(max, Math.max(this.value, min))
-            this.inputElement.value = `${this.value}`;
-            this.element.dispatchEvent(this.fieldChangedEvent);
-        }
-
         this.incrementButtonElement = document.createElement("button");
         this.incrementButtonElement.textContent = "+";
         this.incrementButtonElement.type = "button";
-        this.incrementButtonElement.onclick = () => consumer(1);
+        this.incrementButtonElement.onclick = () => this.onButtonClicked(1);
 
         this.decrementButtonElement = document.createElement("button");
         this.decrementButtonElement.textContent = "-";
         this.decrementButtonElement.type = "button";
-        this.decrementButtonElement.onclick = () => consumer(-1);
+        this.decrementButtonElement.onclick = () => this.onButtonClicked(-1);
 
-        this.fieldContainer = document.createElement("div");
-        this.fieldContainer.appendChild(this.decrementButtonElement);
-        this.fieldContainer.appendChild(this.inputElement);
-        this.fieldContainer.appendChild(this.incrementButtonElement);
+        this.fieldContainerElement = document.createElement("div");
+        this.fieldContainerElement.appendChild(this.decrementButtonElement);
+        this.fieldContainerElement.appendChild(this.inputElement);
+        this.fieldContainerElement.appendChild(this.incrementButtonElement);
 
-        this.element = document.createElement("p");
-        this.element.textContent = label;
-        this.element.classList = "number-field"
-        this.element.appendChild(this.fieldContainer);
+        this.element.appendChild(this.titleElement);
+        this.element.appendChild(this.fieldContainerElement);
 
-        this.inputElement.addEventListener("change", () => {
-            this.value = Number(this.inputElement.value);
-            this.element.dispatchEvent(this.fieldChangedEvent);
-        });
+        this.inputElement.onchange =  () => this.onInputChanged();
     }
-    getDom(): HTMLParagraphElement {
-        return this.element;
+    private onButtonClicked(amount: number) {
+        let max = Number(this.inputElement.max);
+        let min = Number(this.inputElement.min);
+
+        this.value = Number(this.inputElement.value) + amount;
+        this.value = Math.min(max, Math.max(this.value, min))
+        this.inputElement.value = `${this.value}`;
+        this.element.dispatchEvent(this.fieldChangedEvent);
+    }
+    private onInputChanged() {
+        this.value = Number(this.inputElement.value);
+        this.element.dispatchEvent(this.fieldChangedEvent);
     }
     setMax(value: number) {
         this.inputElement.max = `${value}`;
@@ -63,20 +77,17 @@ class NumberField implements Field {
     getValue(): number {
         return this.value;
     }
-    addChangedListener(listenerConsumer: EventListenerOrEventListenerObject) {
-        this.element.addEventListener("valueChanged", listenerConsumer);
-    }
 }
 
-class CheckBoxField implements Field {
+class CheckBoxField extends AbstractField {
     private inputElement: HTMLInputElement;
     private fakeBoxElement: HTMLSpanElement;
     private checked: boolean = false;
     private labels = { off: "", on: ""}
-    element: HTMLLabelElement;
-    fieldChangedEvent = new CustomEvent("checkboxUpdated");
 
     constructor(off_label?: string, on_label?: string) {
+        super("checkboxUpdated", "checkbox-field");
+
         this.inputElement = document.createElement("input");
         this.inputElement.type = "checkbox";
 
@@ -87,8 +98,6 @@ class CheckBoxField implements Field {
         this.fakeBoxElement.classList = "checkbox-faker";
         if (this.labels.off) this.fakeBoxElement.textContent = this.labels.off;
         
-        this.element = document.createElement("label");
-        this.element.classList = "checkbox-div";
         this.element.appendChild(this.inputElement);
         this.element.appendChild(this.fakeBoxElement);
 
@@ -105,38 +114,28 @@ class CheckBoxField implements Field {
             this.element.dispatchEvent(this.fieldChangedEvent);
         });
     }
-    getDom(): HTMLLabelElement {
-        return this.element;
-    }
     getCheckedState(): boolean {
         return this.checked;
     }
-    addChangedListener(listenerConsumer: EventListenerOrEventListenerObject) {
-        this.element.addEventListener("checkboxUpdated", listenerConsumer);
-    }
 }
 
-class OptionsField implements Field {
+class OptionsField extends AbstractField {
     private options: string[];
     private selectedOptions?: string;
     private selectElement: HTMLSelectElement;
-    element: HTMLLabelElement;
-    fieldChangedEvent = new CustomEvent("optionPicked");
 
     constructor(label: string, options: string[]) {
+        super("optionPicked", "select-field")
         this.options = options;
         this.selectElement = document.createElement("select");
         this.selectElement.classList = "select-field-input"
-        
-        this.element = document.createElement("label");
-        this.element.textContent = label;
-        this.element.classList = "select-field-container";
+
         this.element.appendChild(this.selectElement);
         this.element.addEventListener("change", () => this.setSelectedOption());
     }
-    getDom(): HTMLLabelElement {
+    getDom(): HTMLDivElement {
         this.addOptionElements();
-        return this.element;
+        return super.getDom();
     }
     overwriteOptions(newOptions: string[]) {
         this.options = newOptions;
@@ -166,21 +165,17 @@ class OptionsField implements Field {
         if (this.selectedOptions) return this.selectedOptions;
         return "";
     }
-    addChangedListener(listenerConsumer: EventListenerOrEventListenerObject) {
-        this.element.addEventListener("optionPicked", listenerConsumer);
-    }
     dispatchOptionPicked() {
         this.element.dispatchEvent(this.fieldChangedEvent);
     }
 }
 
-class JsonFileField implements Field {
+class JsonFileField extends AbstractField {
     private jsonContent?: string;
-    element: HTMLInputElement;
-    fieldChangedEvent = new CustomEvent("jsonDelivered");
 
     constructor() {
-        this.element = document.createElement("input");
+        super("jsonDelivered", "json-input-field");
+
         this.element.accept = ".json";
         this.element.type = "file";
         this.element.multiple = false;
@@ -201,15 +196,9 @@ class JsonFileField implements Field {
             if (file) reader.readAsText(file);
         });
     }
-    getDom(): HTMLInputElement {
-        return this.element;
-    }
     getJsonContent(): string {
         if (this.jsonContent) return this.jsonContent;
         return "";
-    }
-    addChangedListener(listenerConsumer: EventListenerOrEventListenerObject) {
-        this.element.addEventListener("jsonDelivered", listenerConsumer);
     }
 }
 
