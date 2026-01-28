@@ -139,9 +139,15 @@ class OptionsField extends AbstractField {
     }
     overwriteOptions(newOptions: string[]) {
         this.options = newOptions;
+        this.selectElement.length = 0;
         this.addOptionElements();
 
-        if (!this.selectedOptions) this.setSelectedOption();
+        if (this.selectedOptions && this.options.includes(this.selectedOptions)) {
+            this.selectElement.value = this.selectedOptions;
+            this.dispatchOptionPicked();
+        }else{
+             this.setSelectedOption();
+        }
     }
     private addOptionElements() {
         let optionElements: HTMLOptionElement[] = this.options.map((value) => {
