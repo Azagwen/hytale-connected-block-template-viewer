@@ -232,7 +232,7 @@ function initControls() {
     let jsonDisplayTitle = document.createElement("p");
     let jsonDisplay = document.createElement("div");
 
-    jsonDisplayTitle.textContent = "Shape JSON";
+    jsonDisplayTitle.textContent = "Shape JSON view";
     jsonDisplayTitle.id = "json_display_title";
     jsonDisplay.id = "json_display";
     formContainer?.appendChild(form);
