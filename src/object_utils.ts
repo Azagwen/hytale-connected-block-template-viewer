@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { range } from "three/tsl";
 
 const loader = new THREE.TextureLoader();
 
