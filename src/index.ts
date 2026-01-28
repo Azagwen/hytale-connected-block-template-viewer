@@ -12,12 +12,12 @@ function main() {
         View.sceneObjects.neighborCubes.length = 0;
 
         let unpackFaceTags = function(faceTags: any): (string | null)[] {
-            let up: string | null = faceTags?.Up?.join("\n");
-            let down: string | null = faceTags?.Down?.join("\n");
-            let north: string | null = faceTags?.North?.join("\n");
-            let south: string | null = faceTags?.South?.join("\n");
-            let west: string | null = faceTags?.West?.join("\n");
-            let east: string | null = faceTags?.East?.join("\n");
+            let up: string | null = faceTags?.Up?.join("<br>");
+            let down: string | null = faceTags?.Down?.join("<br>");
+            let north: string | null = faceTags?.North?.join("<br>");
+            let south: string | null = faceTags?.South?.join("<br>");
+            let west: string | null = faceTags?.West?.join("<br>");
+            let east: string | null = faceTags?.East?.join("<br>");
             return [up, down, north, south, west, east];
         }
         

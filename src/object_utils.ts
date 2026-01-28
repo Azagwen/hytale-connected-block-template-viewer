@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { range } from "three/tsl";
 
 const loader = new THREE.TextureLoader();
 
@@ -23,14 +24,15 @@ function textTexture(text: string): THREE.CanvasTexture;
 function textTexture(text: string, bgColor?: string, txtColor?: string): THREE.CanvasTexture;
 function textTexture(text: string, bgColor: string = "#fff", txtColor: string = "hsl(0, 0%, 25%)"): THREE.CanvasTexture {
     let margin = 4;
-    let size = 16;
+    let size = 32;
     let doubleMargin = margin * 2;
-    let ctx = document.createElement("canvas").getContext("2d");
     let font = `${size}px AzaFont`;
+    let ctx = document.createElement("canvas").getContext("2d");
 
     if (ctx) {
         ctx.font = font;
-        let textSize = ctx.measureText(text);
+        let lines = text.split("<br>");
+        let textSize = ctx.measureText(lines.reduce((a, b) => a.length > b.length ? a : b));
 
         // set canvas size
         ctx.canvas.width = textSize.width + doubleMargin;
@@ -40,12 +42,22 @@ function textTexture(text: string, bgColor: string = "#fff", txtColor: string = 
         ctx.fillStyle = bgColor;
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-        // render text
+        // render text (styling)
         ctx.textBaseline = "middle";
         ctx.font = font;
         ctx.fillStyle = txtColor;
-        ctx.fillText(text, margin, ctx.canvas.height / 2);
+        
+        // render text (actual rendering)
+        let canvasCenter = ctx.canvas.height / 2;
+        let lineHeight = size + size / 2;
+        let paragraphHeight = lineHeight * lines.length;
+        let paragraphCenter = paragraphHeight / 2;
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            ctx.fillText(line, margin, (canvasCenter - paragraphCenter) + (lineHeight * i) + (lineHeight / 2));
+        }
 
+        // finalize texture and return it
         let texture = new THREE.CanvasTexture(ctx.canvas);
         texture.colorSpace = THREE.SRGBColorSpace;
         texture.magFilter = THREE.NearestFilter;
