@@ -203,7 +203,6 @@ class JsonFileField extends AbstractField {
         this.reloadButton.classList = "json-reload-button"
         this.reloadButton.disabled = true;
 
-        // Container to keep input and button on the same line
         this.element.appendChild(this.inputElement);
         this.element.appendChild(this.reloadButton);
 
