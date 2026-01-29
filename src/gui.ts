@@ -184,7 +184,9 @@ class OptionsField extends AbstractField {
 
 class JsonFileField extends AbstractField {
     private jsonContent?: string;
+    private lastFile?: File;
     private inputElement: HTMLInputElement;
+    private reloadButton: HTMLButtonElement;
 
     constructor() {
         super("jsonDelivered", "json-field");
@@ -195,22 +197,41 @@ class JsonFileField extends AbstractField {
         this.inputElement.multiple = false;
         this.inputElement.classList = "json-input"
 
+        this.reloadButton = document.createElement("button");
+        this.reloadButton.textContent = "⟳";
+        this.reloadButton.type = "button";
+        this.reloadButton.classList = "json-reload-button"
+        this.reloadButton.disabled = true;
+
+        // Container to keep input and button on the same line
         this.element.appendChild(this.inputElement);
-        this.element.addEventListener("change", () => {
+        this.element.appendChild(this.reloadButton);
+
+        this.inputElement.addEventListener("change", () => {
             let file = this.inputElement.files?.item(0);
-            let reader = new FileReader();
-
-            reader.addEventListener("load", (event) => {
-                let bfile = event.target?.result;
-
-                if (typeof bfile === "string") {
-                    this.jsonContent = bfile;
-                    this.element.dispatchEvent(this.fieldChangedEvent);
-                }
-            });
-
-            if (file) reader.readAsText(file);
+            if (file) {
+                this.lastFile = file;
+                this.loadFile(file);
+                this.reloadButton.disabled = false;
+            }
+        }); 
+        this.reloadButton.onclick = () => {
+            if (this.lastFile) {
+                this.loadFile(this.lastFile);
+            }
+        };
+    }
+    private loadFile(file: File) {
+        let reader = new FileReader();
+        reader.addEventListener("load", (event) => {
+            let bfile = event.target?.result;
+             if (typeof bfile === "string") {
+                this.jsonContent = bfile;
+                this.element.dispatchEvent(this.fieldChangedEvent);
+            }
         });
+
+        reader.readAsText(file);
     }
     getJsonContent(): string {
         if (this.jsonContent) return this.jsonContent;
