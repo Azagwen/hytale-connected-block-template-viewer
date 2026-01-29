@@ -113,8 +113,11 @@ const sceneObjects = {
         this.shapeLabels.push(sprite);
     },
     setupScene: function(scene: THREE.Scene) {
+        let centerCube = ObjUtils.makeOutlineCube(new THREE.Vector3(0, 0.5, 0), new THREE.Vector3(0.998, 0.998, 0.998), 0xAAAAAA);
         this.makeFloorPlanes();
+
         scene.add(...this.floorPlanes.map((obj) => obj));
+        scene.add(centerCube);
     }
 }
 
@@ -137,7 +140,7 @@ class ViewportScene extends THREE.Scene {
         let camParams = { size: 1, near: 0.1, far: 50 };
         this.camera = new THREE.OrthographicCamera(-camParams.size, camParams.size, camParams.size, -camParams.size, camParams.near, camParams.far);
         this.camera.position.x = -2;
-        this.camera.position.y = 2.5;
+        this.camera.position.y = 2;
         this.camera.position.z = 2;
         this.camera.zoom = 0.4;
 

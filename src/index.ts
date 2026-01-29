@@ -54,7 +54,7 @@ function main() {
 
                     let tint = 0xFF8F8F;
                     if (includeOrExclude === "Include") tint = 0x8FFF8F;
-                    let pos = new THREE.Vector3(offset.X * 1.25, offset.Y * 1.25, offset.Z * 1.25);
+                    let pos = new THREE.Vector3(offset.X * 1.125, offset.Y * 1.125, offset.Z * 1.125);
                     let tags = unpackFaceTags(faceTags);
 
                     if (shapes?.length) {
