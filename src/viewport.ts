@@ -61,11 +61,14 @@ const sceneObjects = {
         westTxt: string | null, eastTxt: string | null
     ) {
         let realPos = new THREE.Vector3(0, 0.5, 0);
+        let size = new THREE.Vector3(0.999, 0.999, 0.999);
+        let tint = 0xFFFFFF;
         let obj = this.makeLabelledCube(realPos, upTxt, downTxt, northTxt, southTxt, westTxt, eastTxt);
-        let baseCube = ObjUtils.makeCube(realPos, new THREE.Vector3(0.999, 0.999, 0.999), 0xFFFFFF, 0.5);
-        // let outlineCube = ObjUtils.makeCube(realPos, new THREE.Vector3(0.999, 0.999, 0.999), 0xFFFFFF, 0.5);
+        let baseCube = ObjUtils.makeCube(realPos, size, tint, 0.5);
+        let outlineCube = ObjUtils.makeOutlineCube(realPos, size, tint, 0.75);
 
         obj.add(baseCube);
+        obj.add(outlineCube);
         this.faceTagCube = obj;
     },
     makeNeighborCube: function(
@@ -76,10 +79,13 @@ const sceneObjects = {
         westTxt: string | null, eastTxt: string | null
     ) {
         let realPos = new THREE.Vector3(0, 0.5, 0).add(position);
+        let size = new THREE.Vector3(0.999, 0.999, 0.999);
         let obj = this.makeLabelledCube(new THREE.Vector3(0, 0.5, 0).add(position), upTxt, downTxt, northTxt, southTxt, westTxt, eastTxt);
-        let baseCube = ObjUtils.makeCube(realPos, new THREE.Vector3(0.999, 0.999, 0.999), tint, 0.5);
+        let baseCube = ObjUtils.makeCube(realPos, size, tint, 0.5);
+        let outlineCube = ObjUtils.makeOutlineCube(realPos, size, tint, 0.75);
 
         obj.add(baseCube);
+        obj.add(outlineCube);
         this.neighborCubes.push(obj);
     },
     makeFloorPlanes: function() {

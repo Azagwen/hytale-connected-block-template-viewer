@@ -67,6 +67,20 @@ function textTexture(text: string, bgColor: string = "#fff", txtColor: string = 
     return new THREE.CanvasTexture();
 }
 
+function makeOutlineCube(position: THREE.Vector3, size: THREE.Vector3, tint: number): THREE.LineSegments;
+function makeOutlineCube(position: THREE.Vector3, size: THREE.Vector3, tint: number, opacity: number): THREE.LineSegments;
+function makeOutlineCube(position: THREE.Vector3, size: THREE.Vector3, tint: number, opacity: number = 1.0): THREE.LineSegments {
+    const geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
+    const lineMat = new THREE.LineBasicMaterial( { color: tint, linewidth: 4, opacity: opacity, transparent: true } );
+    const wireframe = new THREE.LineSegments( new THREE.EdgesGeometry(geometry), lineMat );
+
+    wireframe.position.x = position.x;
+    wireframe.position.y = position.y;
+    wireframe.position.z = position.z;
+    
+    return wireframe;
+}
+
 function makeCube(position: THREE.Vector3, size: THREE.Vector3, tint: number): THREE.Mesh;
 function makeCube(position: THREE.Vector3, size: THREE.Vector3, tint: number, opacity: number): THREE.Mesh;
 function makeCube(position: THREE.Vector3, size: THREE.Vector3, tint: number, opacity: number = 1.0, tex?: THREE.Texture): THREE.Mesh {
@@ -125,5 +139,6 @@ export {
     textTexture,
     MeshContainer,
     makePlane,
-    makeCube
+    makeCube,
+    makeOutlineCube
 }
