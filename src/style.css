@@ -83,11 +83,15 @@ main {
 
 .json-field {
    background-color: var(--button-bg);
+   display: flex;
+   align-items: center;
+   flex-direction: row;
 }
 
 .json-input {
    height: 100%;
-   width: 100%;
+   flex:1;
+   border-right: var(--global-bg) solid 1px;
 }
 
 .json-input::file-selector-button {
@@ -100,6 +104,18 @@ main {
    background-color: var(--button-bg);
    margin-right: var(--padding-1);
    border-right: var(--global-bg) solid 1px;
+}
+
+.json-reload-button
+{
+   padding: var(--padding-1);
+   width: var(--button-height);
+   height: 100%;
+   border-radius: 0;
+   border: none;
+   background-color: var(--button-bg);
+   font-size: large;
+   padding-top: 6px;
 }
 
 .field {
@@ -135,6 +151,7 @@ main {
 .select-field-input:hover,
 .number-field > div > button:hover ,
 .json-input::file-selector-button:hover,
+.json-reload-button:hover,
 .number-field > div > input[type="number"]:hover,
 .checkbox-field > input[type="checkbox"]:hover ~ .checkbox-faker
 {
