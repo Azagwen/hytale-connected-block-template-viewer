@@ -1,7 +1,7 @@
 
 abstract class AbstractField {
     private eventName: string;
-    element: HTMLElement;
+    element: HTMLDivElement;
     fieldChangedEvent: CustomEvent<any>;
 
     constructor(eventName: string, className: string) {
@@ -10,7 +10,7 @@ abstract class AbstractField {
         this.element = document.createElement("div");
         this.element.classList = `field ${className}`;
     }
-    getDom(): HTMLElement {
+    getDom(): HTMLDivElement {
         return this.element;
     }
     addChangedListener(listenerConsumer: EventListenerOrEventListenerObject): void {
@@ -29,7 +29,7 @@ class NumberField extends AbstractField {
 
     constructor(label: string) {
         super("valueChanged", "number-field");
-        
+
         this.titleElement = document.createElement("label");
         this.titleElement.textContent = label;
 
@@ -100,7 +100,6 @@ class CheckBoxField extends AbstractField {
         
         this.element.appendChild(this.inputElement);
         this.element.appendChild(this.fakeBoxElement);
-
         this.inputElement.addEventListener("change", () => {
             this.checked = this.inputElement.checked;
 
@@ -120,9 +119,10 @@ class CheckBoxField extends AbstractField {
 }
 
 class OptionsField extends AbstractField {
+    private selectElement: HTMLSelectElement;
+    private titleElement: HTMLLabelElement;
     private options: string[];
     private selectedOptions?: string;
-    private selectElement: HTMLSelectElement;
 
     constructor(label: string, options: string[]) {
         super("optionPicked", "select-field")
@@ -130,6 +130,11 @@ class OptionsField extends AbstractField {
         this.selectElement = document.createElement("select");
         this.selectElement.classList = "select-field-input"
 
+        this.titleElement = document.createElement("label");
+        this.titleElement.textContent = label;
+        this.titleElement.classList = "select-field-title";
+
+        this.element.appendChild(this.titleElement);
         this.element.appendChild(this.selectElement);
         this.element.addEventListener("change", () => this.setSelectedOption());
     }
@@ -145,7 +150,8 @@ class OptionsField extends AbstractField {
         if (this.selectedOptions && this.options.includes(this.selectedOptions)) {
             this.selectElement.value = this.selectedOptions;
             this.dispatchOptionPicked();
-        }else{
+        }
+        else {
              this.setSelectedOption();
         }
     }
@@ -178,16 +184,20 @@ class OptionsField extends AbstractField {
 
 class JsonFileField extends AbstractField {
     private jsonContent?: string;
+    private inputElement: HTMLInputElement;
 
     constructor() {
-        super("jsonDelivered", "json-input-field");
+        super("jsonDelivered", "json-field");
 
-        this.element.accept = ".json";
-        this.element.type = "file";
-        this.element.multiple = false;
+        this.inputElement = document.createElement("input")
+        this.inputElement.accept = ".json";
+        this.inputElement.type = "file";
+        this.inputElement.multiple = false;
+        this.inputElement.classList = "json-input"
 
+        this.element.appendChild(this.inputElement);
         this.element.addEventListener("change", () => {
-            let file = this.element.files?.item(0);
+            let file = this.inputElement.files?.item(0);
             let reader = new FileReader();
 
             reader.addEventListener("load", (event) => {

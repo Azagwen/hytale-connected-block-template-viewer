@@ -81,11 +81,16 @@ main {
    margin-bottom: var(--padding-1);
 }
 
-.json-input-field {
+.json-field {
    background-color: var(--button-bg);
 }
 
-.json-input-field::file-selector-button {
+.json-input {
+   height: 100%;
+   width: 100%;
+}
+
+.json-input::file-selector-button {
    height: 100%;
    width: 25%;
    border-radius: 0;
@@ -106,23 +111,30 @@ main {
 .select-field {
    display: flex;  
    align-items: center;
-   padding-left: var(--padding-1);
    justify-content: space-between;
 }
 
 .select-field-input {
    height: 100%;
+   width: 100%;
    border-radius: 0;
    border: none;
    padding: var(--padding-1);
    flex-grow: 1;
-   margin-left: var(--padding-2);
    border-left: var(--global-bg) solid 1px;
+   background-color: var(--button-bg);
+}
+
+.select-field-title {
+   height: 100%;
+   width: 100%;
+   padding-left: var(--padding-1);
+   align-content: center;
 }
 
 .select-field-input:hover,
 .number-field > div > button:hover ,
-.json-input-field::file-selector-button:hover,
+.json-input::file-selector-button:hover,
 .number-field > div > input[type="number"]:hover,
 .checkbox-field > input[type="checkbox"]:hover ~ .checkbox-faker
 {
@@ -158,22 +170,25 @@ main {
    position: absolute;
    cursor: pointer;
    opacity: 0;
-   height: 0;
-   width: 0;
+   height: 100%;
+   width: 100%;
+   margin: 0;
 }
 
 .checkbox-faker {
    display: block;
+   height: 100%;
    width: 100%;
-   padding: var(--padding-1);
+   padding-left: var(--padding-1);
    background-color: var(--button-bg);
+   align-content: center;
 }
 
-.checkbox-field > input[type="checkbox"]:checked ~ .checkbox-faker {  
+.checkbox-field > input[type="checkbox"]:checked ~ .checkbox-faker {
    background-color: var(--button-bg-pressed);
 }
 
-.checkbox-field > input[type="checkbox"]:checked:hover ~ .checkbox-faker {  
+.checkbox-field > input[type="checkbox"]:checked:hover ~ .checkbox-faker {
    background-color: var(--button-bg-pressed-hover);
 }
 
