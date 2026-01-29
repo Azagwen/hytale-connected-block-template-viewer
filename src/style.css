@@ -83,7 +83,16 @@ main {
    background-color: var(--button-bg);
 }
 
-#controls > form > input[type="file"]::file-selector-button {
+.json-file-field {
+   background-color: var(--button-bg);
+   margin-bottom: var(--padding-1);
+   display: flex;
+   align-items: center;
+   flex-direction: row;
+   justify-content: space-between;
+}
+
+.json-file-field > input[type="file"]::file-selector-button {
    border-radius: 0;
    border: none;
    border-right: var(--global-bg) var(--padding-1) solid;
@@ -91,6 +100,32 @@ main {
    background-color: var(--button-bg);
    margin-right: var(--padding-1);
    border-right: var(--global-bg) solid 1px;
+}
+
+.json-file-field > input {
+   border-radius: 0;
+   border: none;
+   background-color: var(--button-bg);
+}
+
+.json-file-field > button {
+   padding: var(--padding-1);
+   width: var(--padding-4);
+   height: var(--padding-4);
+   border-radius: 0;
+   border: none;
+   background-color: var(--button-bg);
+   border-left: var(--global-bg) solid 1px;
+   font-size: large;
+   padding-top: 6px;
+}
+
+.json-file-field > button:hover {
+   background-color: var(--button-bg-hover);
+}
+
+.json-file-field > button:active {
+   background-color: var(--button-bg-pressed);
 }
 
 .select-field-container {

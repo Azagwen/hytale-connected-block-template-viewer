@@ -182,33 +182,62 @@ class OptionsField implements Field {
 
 class JsonFileField implements Field {
     private jsonContent?: string;
+    private lastFile?: File;
     element: HTMLInputElement;
+    reloadButton: HTMLButtonElement;
+    private container: HTMLDivElement;
     fieldChangedEvent = new CustomEvent("jsonDelivered");
-
+    
     constructor() {
         this.element = document.createElement("input");
         this.element.accept = ".json";
         this.element.type = "file";
         this.element.multiple = false;
 
+        // Create reload button
+        this.reloadButton = document.createElement("button");
+        this.reloadButton.textContent = "⟳";
+        this.reloadButton.type = "button";
+        this.reloadButton.disabled = true;
+
+        // Container to keep input and button on the same line
+        this.container = document.createElement("div");
+        this.container.classList = "json-file-field";
+        this.container.appendChild(this.element);
+        this.container.appendChild(this.reloadButton);
+
         this.element.addEventListener("change", () => {
             let file = this.element.files?.item(0);
-            let reader = new FileReader();
-
-            reader.addEventListener("load", (event) => {
-                let bfile = event.target?.result;
-
-                if (typeof bfile === "string") {
-                    this.jsonContent = bfile;
-                    this.element.dispatchEvent(this.fieldChangedEvent);
-                }
-            });
-
-            if (file) reader.readAsText(file);
+            if (file) {
+                this.lastFile = file;
+                this.loadFile(file);
+                this.reloadButton.disabled = false;
+            }
         });
+
+        this.reloadButton.onclick = () => {
+            if (this.lastFile) {
+                this.loadFile(this.lastFile);
+            }
+        };
     }
-    getDom(): HTMLInputElement {
-        return this.element;
+    
+    private loadFile(file: File) {
+        let reader = new FileReader();
+
+        reader.addEventListener("load", (event) => {
+            let bfile = event.target?.result;
+
+            if (typeof bfile === "string") {
+                this.jsonContent = bfile;
+                this.element.dispatchEvent(this.fieldChangedEvent);
+            }
+        });
+
+        reader.readAsText(file);
+    }
+    getDom(): HTMLDivElement {
+        return this.container;
     }
     getJsonContent(): string {
         if (this.jsonContent) return this.jsonContent;
