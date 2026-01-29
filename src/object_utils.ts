@@ -67,6 +67,20 @@ function textTexture(text: string, bgColor: string = "#fff", txtColor: string = 
     return new THREE.CanvasTexture();
 }
 
+function makeBillBoard(position: THREE.Vector3, size: THREE.Vector2, tint: number, opacity: number, tex?: THREE.Texture): THREE.Sprite {
+    const material = new THREE.SpriteMaterial( {color: tint, map: tex ? tex : null, opacity: opacity, transparent: true, alphaTest: 0.01} );
+    let sprite = new THREE.Sprite(material);
+    
+    sprite.scale.x = size.x;
+    sprite.scale.y = size.y;
+
+    sprite.position.x = position.x;
+    sprite.position.y = position.y;
+    sprite.position.z = position.z;
+
+    return sprite;
+}
+
 function makeOutlineCube(position: THREE.Vector3, size: THREE.Vector3, tint: number): THREE.LineSegments;
 function makeOutlineCube(position: THREE.Vector3, size: THREE.Vector3, tint: number, opacity: number): THREE.LineSegments;
 function makeOutlineCube(position: THREE.Vector3, size: THREE.Vector3, tint: number, opacity: number = 1.0): THREE.LineSegments {
@@ -104,7 +118,8 @@ function makePlane(rayPickable: boolean, position: THREE.Vector3, rotation: THRE
     const materialSettings = {
         color: tint, 
         map: texUpper ? texUpper : null, 
-        side: doubleFaced ? THREE.FrontSide : THREE.DoubleSide
+        side: doubleFaced ? THREE.FrontSide : THREE.DoubleSide, 
+        transparent: true
     };
     const materialUpper = new THREE.MeshBasicMaterial(materialSettings);
     const meshUpper = new THREE.Mesh(geometry, materialUpper);
@@ -121,7 +136,7 @@ function makePlane(rayPickable: boolean, position: THREE.Vector3, rotation: THRE
     
     // Create second face if specified
     if (doubleFaced) {
-        const materialLower = new THREE.MeshBasicMaterial( {color: tint, map: texLower} );
+        const materialLower = new THREE.MeshBasicMaterial( {color: tint, map: texLower, transparent: true} );
         const meshLower = new THREE.Mesh(geometry, materialLower);
         meshLower.rotation.y = Math.PI;
         meshUpper.add(meshLower);
@@ -140,5 +155,6 @@ export {
     MeshContainer,
     makePlane,
     makeCube,
-    makeOutlineCube
+    makeOutlineCube,
+    makeBillBoard
 }

@@ -227,7 +227,8 @@ const Data = {
         jsonFileField: new JsonFileField(),
         shapesField: new OptionsField("Shape Selector", []),
         showPatternsField: new CheckBoxField("Showing: Face Tags", "Showing: Patterns"),
-        patternIndex: new NumberField("Pattern Index")
+        showFloorGridField: new CheckBoxField("Disable Floor Grid", "Enable Floor Grid"),
+        patternIndexField: new NumberField("Pattern Index")
     }
 }
 
@@ -276,7 +277,8 @@ function initControls() {
     fields.push(Data.controls.jsonFileField);
     fields.push(Data.controls.shapesField);
     fields.push(Data.controls.showPatternsField);
-    fields.push(Data.controls.patternIndex);
+    fields.push(Data.controls.showFloorGridField);
+    fields.push(Data.controls.patternIndexField);
     fields.forEach((field) => form.appendChild(field.getDom()));
 }
 

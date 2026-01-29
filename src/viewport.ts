@@ -22,6 +22,7 @@ const sceneObjects = {
     floorPlanes: new Array<THREE.Mesh>(),
     faceTagCube: undefined as THREE.Object3D | undefined,
     neighborCubes: new Array<THREE.Object3D>(),
+    shapeLabels: new Array<THREE.Sprite>(),
     makeLabelledCube: function(
         position: THREE.Vector3,
         upTxt: string | null, downTxt: string | null, 
@@ -40,7 +41,7 @@ const sceneObjects = {
         let containerObj = new THREE.Object3D();
         let addPlane = function(position: THREE.Vector3, rotation: THREE.Vector3, color: number, text: string | null) {
             if (text) {
-                let texture = ObjUtils.textTexture(text);
+                let texture = ObjUtils.textTexture(text, "rgba(255, 255, 255, 0.875)", "#8f8f8f");
                 let plane = ObjUtils.makePlane(true, position, rotation, size, color, texture, texture);
                 containerObj.add(plane);
             }
@@ -64,7 +65,7 @@ const sceneObjects = {
         let size = new THREE.Vector3(0.999, 0.999, 0.999);
         let tint = 0xFFFFFF;
         let obj = this.makeLabelledCube(realPos, upTxt, downTxt, northTxt, southTxt, westTxt, eastTxt);
-        let baseCube = ObjUtils.makeCube(realPos, size, tint, 0.5);
+        let baseCube = ObjUtils.makeCube(realPos, size, tint, 0.25);
         let outlineCube = ObjUtils.makeOutlineCube(realPos, size, tint, 0.75);
 
         obj.add(baseCube);
@@ -81,7 +82,7 @@ const sceneObjects = {
         let realPos = new THREE.Vector3(0, 0.5, 0).add(position);
         let size = new THREE.Vector3(0.999, 0.999, 0.999);
         let obj = this.makeLabelledCube(new THREE.Vector3(0, 0.5, 0).add(position), upTxt, downTxt, northTxt, southTxt, westTxt, eastTxt);
-        let baseCube = ObjUtils.makeCube(realPos, size, tint, 0.5);
+        let baseCube = ObjUtils.makeCube(realPos, size, tint, 0.25);
         let outlineCube = ObjUtils.makeOutlineCube(realPos, size, tint, 0.75);
 
         obj.add(baseCube);
@@ -103,6 +104,13 @@ const sceneObjects = {
             ObjUtils.makePlane(false, new THREE.Vector3(-1, 0,  1), rotation, size, 0x3F3F3F),
             ObjUtils.makePlane(false, new THREE.Vector3( 1, 0,  1), rotation, size, 0x3F3F3F)
         );
+    },
+    makeShapeLabel(position: THREE.Vector3, label: string) {
+        let realPos = new THREE.Vector3(0, 0.5, 0).add(position);
+        let size = new THREE.Vector2(1, 1);
+        let sprite = ObjUtils.makeBillBoard(realPos, size, 0xFFFFFF, 1.0, ObjUtils.textTexture(label, "#FFF0", "#FFF"));
+
+        this.shapeLabels.push(sprite);
     },
     setupScene: function(scene: THREE.Scene) {
         this.makeFloorPlanes();
