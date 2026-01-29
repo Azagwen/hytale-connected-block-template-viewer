@@ -244,7 +244,7 @@ main {
 }
 
 .number-field > div > button {
-   width: 50%;
+   min-width: var(--button-height);
    border-radius: 0;
    border: none;
    cursor: pointer;
@@ -253,11 +253,12 @@ main {
 }
 
 .number-field > div > input[type="number"] {
+   /* I know this is slower, but it's the easiest way */
+   min-width: calc(var(--padding-2) - calc(100% - calc(var(--button-height) * 2)));
    padding: var(--padding-1);
    border-radius: 0;
    border: none;
    cursor: pointer;
-   width: 100%;
    border-left: var(--global-bg) solid 1px;
    -moz-appearance: textfield; 
 }
