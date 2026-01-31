@@ -18,16 +18,20 @@ function addOneRuleBox (rule: Schema.RuleToMatch) {
     let faceTags = rule.FaceTags;
     let shapes = rule.Shapes;
     let includeOrExclude = rule.IncludeOrExclude;
+    let types = rule.BlockTypes;
+    let typeLists = rule.BlockTypeLists;
+    let normals = rule.PlacementNormals;
 
-    let tint = 0xFF8F8F;
-    if (includeOrExclude === "Include") tint = 0x8FFF8F;
+    let tint = includeOrExclude === "Include" ? 0x8FFF8F : 0xFF8F8F;
     let pos = new THREE.Vector3(offset!.X * 1.125, offset!.Y * 1.125, offset!.Z * 1.125);
     let tags = unpackFaceTags(faceTags);
 
-    if (shapes?.length) {
-        let shapeText = shapes?.join("<br>");
-        View.sceneObjects.makeShapeLabel(pos, shapeText);
-    }
+    let texts: string[] = [];
+    if (shapes?.length) texts.push(...shapes);
+    if (types?.length) texts.push(...types);
+    if (typeLists?.length) texts.push(...typeLists);
+    if (normals?.length) texts.push(...normals);
+    View.sceneObjects.makeShapeLabel(pos, texts.join("<br>"));
 
     View.sceneObjects.makeNeighborCube(pos, tint, tags[0], tags[1], tags[2], tags[3], tags[4], tags[5]);
 }
