@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import * as ObjUtils from "./object_utils.ts";
-import { OrbitControls } from "three/examples/jsm/Addons.js";
+import { OrbitControls, ThreeMFLoader } from "three/examples/jsm/Addons.js";
 
 // colors
 const color_x_pos = 0xFF8F8F;
@@ -23,6 +23,17 @@ const sceneObjects = {
     faceTagCube: undefined as THREE.Object3D | undefined,
     neighborCubes: new Array<THREE.Object3D>(),
     shapeLabels: new Array<THREE.Sprite>(),
+    emptyScene(scene: ViewportScene) {
+        if (this.faceTagCube) scene.remove(this.faceTagCube);
+
+        if (this.floorPlanes?.length) this.floorPlanes.forEach((obj) => scene.remove(obj));
+        if (this.neighborCubes?.length) this.neighborCubes.forEach((obj) => scene.remove(obj));
+        if (this.shapeLabels?.length) this.shapeLabels.forEach((obj) => scene.remove(obj));
+
+        this.floorPlanes.length = 0;
+        this.neighborCubes.length = 0;
+        this.shapeLabels.length = 0;
+    },
     makeLabelledCube: function(
         position: THREE.Vector3,
         upTxt: string | null, downTxt: string | null, 
@@ -105,7 +116,7 @@ const sceneObjects = {
             ObjUtils.makePlane(false, new THREE.Vector3( 1, 0,  1), rotation, size, 0x3F3F3F)
         );
     },
-    makeShapeLabel(position: THREE.Vector3, label: string) {
+    makeShapeLabel: function(position: THREE.Vector3, label: string) {
         let realPos = new THREE.Vector3(0, 0.5, 0).add(position);
         let size = new THREE.Vector2(1, 1);
         let sprite = ObjUtils.makeBillBoard(realPos, size, 0xFFFFFF, 1.0, ObjUtils.textTexture(label, "#FFF0", "#FFF"));
