@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import * as ObjUtils from "./object_utils.ts";
-import { OrbitControls, ThreeMFLoader } from "three/examples/jsm/Addons.js";
 
 // colors
 const color_x_pos = 0xFF8F8F;
