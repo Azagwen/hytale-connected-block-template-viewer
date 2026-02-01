@@ -67,7 +67,7 @@ function processJson(scene: View.ViewportScene) {
 
         if (patterns && (patternIndex < patterns.length)) {
             let pattern = patterns[patternIndex];
-            setMaxPatterns(patternIndex);
+            setMaxPatterns(patterns.length);
 
             let rules = pattern.RulesToMatch;
             if (rules) {
