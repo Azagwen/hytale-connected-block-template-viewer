@@ -23,7 +23,10 @@ function addOneRuleBox (rule: Schema.RuleToMatch) {
     let normals = rule.PlacementNormals;
 
     let tint = includeOrExclude === "Include" ? 0x8FFF8F : 0xFF8F8F;
-    let pos = new THREE.Vector3(offset!.X * 1.125, offset!.Y * 1.125, offset!.Z * 1.125);
+    let x = (offset && offset.X ? offset.X : 0) * 1.125;
+    let y = (offset && offset.Y ? offset.Y : 0) * 1.125;
+    let z = (offset && offset.Z ? offset.Z : 0) * 1.125;
+    let pos = new THREE.Vector3(x, y, z);
     let tags = unpackFaceTags(faceTags);
 
     let texts: string[] = [];
@@ -49,7 +52,7 @@ function addNeighborCubes(scene: View.ViewportScene) {
 }
 
 function setMaxPatterns(patternAmount: number) {
-    GUI.Data.controls.patternIndexField.setMax(patternAmount - 1);
+    GUI.Data.controls.patternIndexField.setMax(Math.max(patternAmount - 1, 0));
 }
 
 function processJson(scene: View.ViewportScene) {
