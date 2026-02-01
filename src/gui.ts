@@ -207,21 +207,24 @@ class JsonFileField extends AbstractField {
         this.element.appendChild(this.reloadButton);
 
         this.inputElement.addEventListener("change", () => {
-            let file = this.inputElement.files?.item(0);
+            let file = this.getCurrentInputFile();
+            
             if (file) {
                 this.lastFile = file;
-                this.loadFile(file);
+                this.loadFile();
                 this.reloadButton.disabled = false;
             }
         }); 
         this.reloadButton.onclick = () => {
             if (this.lastFile) {
-                this.loadFile(this.lastFile);
+                this.loadFile();
             }
         };
     }
-    private loadFile(file: File) {
+    private loadFile() {
+        let file = this.getCurrentInputFile();
         let reader = new FileReader();
+
         reader.addEventListener("load", (event) => {
             let bfile = event.target?.result;
              if (typeof bfile === "string") {
@@ -230,7 +233,10 @@ class JsonFileField extends AbstractField {
             }
         });
 
-        reader.readAsText(file);
+        if (file) reader.readAsText(file);
+    }
+    getCurrentInputFile(): File | null | undefined {
+        return this.inputElement.files?.item(0);
     }
     getJsonContent(): string {
         if (this.jsonContent) return this.jsonContent;
