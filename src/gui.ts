@@ -284,7 +284,10 @@ const Data = {
                 if (i == patternIndex) clazz += " selected";
                 if (i == patternList.length - 1) comma = "";
 
-                patternStr += `<i class="${clazz}" data-pattern-index=${i}>        ${JSON.stringify(patternList[i], null, 4)}${comma}</i>`;
+                let data = `data-pattern-index=${i}`;
+                let title = `title="Click me to see pattern ${i}"`;
+
+                patternStr += `<i class="${clazz}" ${data} ${title}>        ${JSON.stringify(patternList[i], null, 4)}${comma}</i>`;
             }
 
             // Stringify original and split patterns off
