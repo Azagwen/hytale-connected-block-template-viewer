@@ -11,14 +11,12 @@
    --padding-4: 40px;
 
    --button-height: 5vh;
+   --header-height: 7.5vh;
 }
 
 html, body {
    margin: 0;
    height: 100%;
-   display: flex;
-   flex-direction: column;
-   object-fit: contain;
 }
 
 @font-face {
@@ -35,15 +33,18 @@ h1 {
    justify-content: space-between;
    align-items: center;
    padding-left: var(--padding-2);
+   height: var(--header-height);
 }
 
 h1 > a {
    margin: 0;
    border-left: #777 solid 1px;
-   padding: var(--padding-2);
    text-decoration: none;
    color: var(--global-bg-dark);
    background-color: var(--button-bg-pressed);
+   height: 100%;
+   align-content: center;
+   padding: 0 var(--padding-2);
 }
 
 h1 > a:hover {
@@ -54,13 +55,13 @@ h1 > a:hover {
 main {
    display: flex;
    flex-direction: row;
-   height: 100%;
+   height: calc(100% - var(--header-height));
 }
 
 #viewport {
+   display: inline-block;
    width: 75vw;
    height: 100%;
-   display: block;
 }
 
 #controls {
@@ -271,6 +272,17 @@ main {
 .number-field > div > input[type=number]::-webkit-inner-spin-button,
 .number-field > div > input[type=number]::-webkit-outer-spin-button
 {
-  -webkit-appearance: none;
-  margin: 0;
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+.pattern-str {
+   margin: 0;
+   font-style: normal;
+   background-color: var(--button-bg);
+   display: block;
+}
+
+.pattern-str.selected {
+   background-color: var(--button-bg-pressed);
 }

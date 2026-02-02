@@ -1,3 +1,4 @@
+import type * as Schema from "./@types/custom_connected_block_template";
 
 abstract class AbstractField {
     private eventName: string;
@@ -255,6 +256,44 @@ const Data = {
         showPatternsField: new CheckBoxField("Showing: Face Tags", "Showing: Patterns"),
         showFloorGridField: new CheckBoxField("Disable Floor Grid", "Enable Floor Grid"),
         patternIndexField: new NumberField("Pattern Index")
+    },
+    updateJson: function() {
+        let display = document.getElementById("json_display");
+        let shape = Data.controls.shapesField.getPickedOption();
+        let patternIndex = Data.controls.patternIndexField.getValue();
+        
+        if (Data.cachedJson.obj && display) {
+            let json = Data.cachedJson.obj as Schema.CustomConnectedBlockTemplateAsset;
+            let shapeObj = json.Shapes![shape];
+            
+            // Collect patterns in a new array, to avoid parasiting the original
+            let patternList: Schema.Pattern[] = [];
+            if (shapeObj.PatternsToMatchAnyOf) {
+                patternList.push(...shapeObj.PatternsToMatchAnyOf);
+            }
+
+            // Concatenate all patterns into a HTML string, to be re-appended in place of the unstyled block.
+            let patternStr: string = "";
+            for (let i = 0; i < patternList.length; i++) {
+                let clazz = "pattern-str";
+                let comma = ",";
+
+                if (i == patternIndex) clazz += " selected";
+                if (i == patternList.length - 1) comma = "";
+
+                patternStr += `<i class="${clazz}">        ${JSON.stringify(patternList[i], null, 4)}${comma}</i>`;
+            }
+
+            // Stringify original and split patterns off
+            let shapeStr: string = JSON.stringify(shapeObj, null, 4);
+            let split = shapeStr.split("\"PatternsToMatchAnyOf\"");
+
+            // Make strings more HTML-friendly, and add back leading spaces for patterns
+            let splitStr = split[0].replaceAll("\n", "<br>");
+            patternStr = patternStr.replaceAll("\n", "<br>        ");
+
+            display.innerHTML = `${splitStr}"PatternsToMatchAnyOf": [<br>${patternStr}    ]<br>}`;
+        }
     }
 }
 
@@ -286,17 +325,8 @@ function initControls() {
     })
 
     // Read shapes trigger
-    Data.controls.shapesField.addChangedListener(() => {
-        let shape = Data.controls.shapesField.getPickedOption();
-
-        if (Data.cachedJson.obj) {
-            let shapeData = Data.cachedJson.obj["Shapes"] as any;
-            let shapeObj = shapeData[shape];
-            let shapeStr = JSON.stringify(shapeObj, null, 4);
-
-            jsonDisplay.textContent = shapeStr;
-        }
-    })
+    Data.controls.shapesField.addChangedListener(Data.updateJson);
+    Data.controls.patternIndexField.addChangedListener(Data.updateJson);
 
     // Add fields to panel
     let fields = [];
