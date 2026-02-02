@@ -60,13 +60,7 @@ class NumberField extends AbstractField {
         this.inputElement.onchange =  () => this.onInputChanged();
     }
     private onButtonClicked(amount: number) {
-        let max = Number(this.inputElement.max);
-        let min = Number(this.inputElement.min);
-
-        this.value = Number(this.inputElement.value) + amount;
-        this.value = Math.min(max, Math.max(this.value, min))
-        this.inputElement.value = `${this.value}`;
-        this.element.dispatchEvent(this.fieldChangedEvent);
+        this.setValue(this.value + amount);
     }
     private onInputChanged() {
         this.value = Number(this.inputElement.value);
@@ -77,6 +71,15 @@ class NumberField extends AbstractField {
     }
     getValue(): number {
         return this.value;
+    }
+    setValue(newVal: number): void {
+        let max = Number(this.inputElement.max);
+        let min = Number(this.inputElement.min);
+
+        this.value = newVal;
+        this.value = Math.min(max, Math.max(this.value, min))
+        this.inputElement.value = `${this.value}`;
+        this.element.dispatchEvent(this.fieldChangedEvent);
     }
 }
 
@@ -257,7 +260,7 @@ const Data = {
         showFloorGridField: new CheckBoxField("Disable Floor Grid", "Enable Floor Grid"),
         patternIndexField: new NumberField("Pattern Index")
     },
-    updateJson: function() {
+    updateJsonDisplay: function() {
         let display = document.getElementById("json_display");
         let shape = Data.controls.shapesField.getPickedOption();
         let patternIndex = Data.controls.patternIndexField.getValue();
@@ -281,7 +284,7 @@ const Data = {
                 if (i == patternIndex) clazz += " selected";
                 if (i == patternList.length - 1) comma = "";
 
-                patternStr += `<i class="${clazz}">        ${JSON.stringify(patternList[i], null, 4)}${comma}</i>`;
+                patternStr += `<i class="${clazz}" data-pattern-index=${i}>        ${JSON.stringify(patternList[i], null, 4)}${comma}</i>`;
             }
 
             // Stringify original and split patterns off
@@ -293,6 +296,14 @@ const Data = {
             patternStr = patternStr.replaceAll("\n", "<br>        ");
 
             display.innerHTML = `${splitStr}"PatternsToMatchAnyOf": [<br>${patternStr}    ]<br>}`;
+        }
+
+        let patternElements = document.querySelectorAll(".pattern-str") as NodeListOf<HTMLLIElement>;
+        if (!patternElements) return;
+        for (let elem of patternElements) {
+            elem.addEventListener("click", () => {
+                Data.controls.patternIndexField.setValue(Number(elem.dataset.patternIndex));
+            })
         }
     }
 }
@@ -325,8 +336,8 @@ function initControls() {
     })
 
     // Read shapes trigger
-    Data.controls.shapesField.addChangedListener(Data.updateJson);
-    Data.controls.patternIndexField.addChangedListener(Data.updateJson);
+    Data.controls.shapesField.addChangedListener(Data.updateJsonDisplay);
+    Data.controls.patternIndexField.addChangedListener(Data.updateJsonDisplay);
 
     // Add fields to panel
     let fields = [];

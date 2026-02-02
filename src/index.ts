@@ -13,7 +13,7 @@ function unpackFaceTags(faceTags: any): (string | null)[] {
     return [up, down, north, south, west, east];
 }
 
-function addOneRuleBox (rule: Schema.RuleToMatch) {
+function addOneRuleBox(rule: Schema.RuleToMatch): void {
     let offset = rule.Position;
     let faceTags = rule.FaceTags;
     let shapes = rule.Shapes;
@@ -39,35 +39,35 @@ function addOneRuleBox (rule: Schema.RuleToMatch) {
     View.sceneObjects.makeNeighborCube(pos, tint, tags[0], tags[1], tags[2], tags[3], tags[4], tags[5]);
 }
 
-function addFaceTagBox (scene: View.ViewportScene, faceTags: Schema.FaceTags | undefined) {
+function addFaceTagBox(scene: View.ViewportScene, faceTags: Schema.FaceTags | undefined): void {
     let tags = unpackFaceTags(faceTags);
 
     View.sceneObjects.makeFaceTagCube(tags[0], tags[1], tags[2], tags[3], tags[4], tags[5]);
     scene.add(View.sceneObjects.faceTagCube!); // we can assert this exists, we just added it.
 }
 
-function addNeighborCubes(scene: View.ViewportScene) {
+function addNeighborCubes(scene: View.ViewportScene): void {
     if (View.sceneObjects.shapeLabels.length) scene.add(...View.sceneObjects.shapeLabels);
     if (View.sceneObjects.neighborCubes.length) scene.add(...View.sceneObjects.neighborCubes);
 }
 
-function setMaxPatterns(patternAmount: number) {
+function setMaxPatterns(patternAmount: number): void {
     GUI.Data.controls.patternIndexField.setMax(Math.max(patternAmount - 1, 0));
 }
 
-function processJson(scene: View.ViewportScene) {
+function processJson(scene: View.ViewportScene): void {
     let json = GUI.Data.cachedJson.obj as any;
     let shapeId = GUI.Data.controls.shapesField.getPickedOption();
     let patternIndex = GUI.Data.controls.patternIndexField.getValue();
 
     let shape: Schema.Shape = json.Shapes[shapeId];
+    let patterns = shape.PatternsToMatchAnyOf;
+    if (patterns) setMaxPatterns(patterns.length);
 
-    if (GUI.Data.controls.showPatternsField.getCheckedState()) {
-        let patterns = shape.PatternsToMatchAnyOf;
+    if (GUI.Data.controls.showPatternsField.getCheckedState() && patterns) {
 
         if (patterns && (patternIndex < patterns.length)) {
             let pattern = patterns[patternIndex];
-            setMaxPatterns(patterns.length);
 
             let rules = pattern.RulesToMatch;
             if (rules) {
@@ -85,25 +85,26 @@ function processJson(scene: View.ViewportScene) {
     }
 }
 
+function updateScene(scene: View.ViewportScene): void {
+    View.sceneObjects.emptyScene(scene);
+
+    if (!GUI.Data.controls.showFloorGridField.getCheckedState()) {
+        View.sceneObjects.makeFloorPlanes();
+        scene.add(...View.sceneObjects.floorPlanes);
+    }
+
+    processJson(scene);
+    
+    scene.render();
+}
+
 function main() {
     const scene = new View.ViewportScene();
     View.sceneObjects.setupScene(scene);
 
-    let listener = () => {
-        View.sceneObjects.emptyScene(scene);
-
-        if (!GUI.Data.controls.showFloorGridField.getCheckedState()) {
-            View.sceneObjects.makeFloorPlanes();
-            scene.add(...View.sceneObjects.floorPlanes);
-        }
-
-        processJson(scene);
-        
-        scene.render();
-    }
-
     GUI.initControls();
-
+    
+    let listener = () => updateScene(scene)
     GUI.Data.controls.shapesField.addChangedListener(listener);
     GUI.Data.controls.showPatternsField.addChangedListener(listener);
     GUI.Data.controls.showFloorGridField.addChangedListener(listener);

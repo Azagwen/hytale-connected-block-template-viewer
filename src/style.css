@@ -2,7 +2,7 @@
    --global-bg-dark: #666;
    --global-bg: #aaa;
    --button-bg: #fff;
-   --button-bg-hover: #ccc;
+   --button-bg-hover: #e8e8e8;
    --button-bg-pressed: #ddd;
    --button-bg-pressed-hover: #eee;
 
@@ -152,6 +152,7 @@ main {
    align-content: center;
 }
 
+.pattern-str:hover,
 .json-reload-button:hover,
 .select-field-input:hover,
 .number-field > div > button:hover ,
@@ -162,6 +163,7 @@ main {
    background-color: var(--button-bg-hover);
 }
 
+.pattern-str.selected,
 .json-reload-button:active,
 .select-field-input:active,
 .number-field > div > button:active,
@@ -172,6 +174,7 @@ main {
    background-color: var(--button-bg-pressed);
 }
 
+.pattern-str.selected:hover,
 .json-reload-button:active:hover,
 .select-field-input:active:hover,
 .number-field > div > button:active:hover
@@ -277,12 +280,18 @@ main {
 }
 
 .pattern-str {
-   margin: 0;
-   font-style: normal;
-   background-color: var(--button-bg);
    display: block;
+   margin: 0;
+   background-color: var(--button-bg);
+   border: var(--button-bg-pressed) solid 1px;
+   font-style: normal;
+   cursor: pointer;
 }
 
 .pattern-str.selected {
-   background-color: var(--button-bg-pressed);
+   border: var(--button-bg-pressed) solid 1px;
+}
+
+.pattern-str.selected:hover {
+   border: var(--button-bg-pressed-hover) solid 1px;
 }
