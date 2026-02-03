@@ -404,12 +404,15 @@ main {
    max-height: 0;
    overflow: hidden;
    border: var(--button-bg) 2px solid;
+   border-bottom: none;
+   border-top: none;
 }
 
 .field-container > details[open=""] ~ div {
    padding-top: var(--padding-1);
    padding-bottom: var(--padding-1);
    max-height: calc(calc(var(--button-height) * 4) + calc(var(--padding-1) * 4));
+   border-bottom: var(--button-bg) 2px solid;
 }
 
 .field-container > details > summary {
@@ -419,7 +422,7 @@ main {
    margin-bottom: 0;
 }
 
-.icon {
+.field .icon {
    width: var(--button-height);
    height: var(--button-height);
    font-style: normal;
@@ -427,4 +430,6 @@ main {
    align-items: center;
    --fa-display: inline-flex;
    justify-content: center;
+   border-right: var(--global-bg) solid 1px;
+   margin-right: var(--padding-1);
 }
