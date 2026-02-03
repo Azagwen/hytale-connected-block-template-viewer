@@ -6,11 +6,26 @@
    --button-bg-pressed: #ddd;
    --button-bg-pressed-hover: #eee;
 
-   --padding-1: 10px;
-   --padding-2: 20px;
-   --padding-4: 40px;
+   --rule-none: rgba(255, 255, 128, 0.5);
+   --rule-exclude: rgba(255, 128, 128, 0.5);
+   --rule-include: rgba(96, 223, 96, 0.5);
 
-   --button-height: 5vh;
+   --rule-none-idle: rgba(255, 255, 128, 0.25);
+   --rule-exclude-idle: rgba(255, 128, 128, 0.25);
+   --rule-include-idle: rgba(96, 223, 96, 0.25);
+
+   --facetag-north: rgba(255, 255, 128, 0.5);
+   --facetag-south: rgba(128, 128, 255, 0.5);
+   --facetag-west: rgba(128, 255, 255, 0.5);
+   --facetag-east: rgba(255, 128, 128, 0.5);
+   --facetag-down: rgba(255, 128, 255, 0.5);
+   --facetag-up: rgba(96, 223, 96, 0.5);;
+
+   --padding-1: 1vh;
+   --padding-2: 2vh;
+   --padding-4: 4vh;
+
+   --button-height: 4vh;
    --header-height: 7.5vh;
 }
 
@@ -110,21 +125,24 @@ main {
 
 .json-reload-button
 {
-   padding: var(--padding-1);
    width: var(--button-height);
    height: 100%;
    border-radius: 0;
    border: none;
    background-color: var(--button-bg);
    font-size: large;
-   padding-top: 6px;
    cursor: pointer;
+   padding: 0;
 }
 
 .field {
    height: var(--button-height);
    background-color: var(--button-bg);
    margin-bottom: var(--padding-1);
+}
+
+.field:last-child {
+   margin-bottom: 0;
 }
 
 .select-field {
@@ -152,6 +170,7 @@ main {
    align-content: center;
 }
 
+.field-container > summary:hover,
 .pattern-str:hover,
 .json-reload-button:hover,
 .select-field-input:hover,
@@ -163,7 +182,7 @@ main {
    background-color: var(--button-bg-hover);
 }
 
-.pattern-str.selected,
+.field-container > summary:active,
 .json-reload-button:active,
 .select-field-input:active,
 .number-field > div > button:active,
@@ -174,7 +193,6 @@ main {
    background-color: var(--button-bg-pressed);
 }
 
-.pattern-str.selected:hover,
 .json-reload-button:active:hover,
 .select-field-input:active:hover,
 .number-field > div > button:active:hover
@@ -191,6 +209,13 @@ main {
    padding: var(--padding-1);
    white-space: pre-wrap;
    background-color: var(--button-bg);
+   font-family: "Noto Sans Mono", monospace;
+   font-optical-sizing: auto;
+   font-size: small;
+   font-weight: 400;
+   font-style: normal;
+   font-variation-settings:
+     "wdth" 62.5;
 }
 
 #json_display_title {
@@ -222,13 +247,11 @@ main {
    display: block;
    height: 100%;
    width: 100%;
-   padding-left: var(--padding-1);
    background-color: var(--button-bg);
    align-content: center;
 }
 
 .number-field {
-   margin: 0;
    display: flex;
    flex-direction: row;
    justify-content: space-between;
@@ -257,14 +280,13 @@ main {
 }
 
 .number-field > div > input[type="number"] {
-   /* I know this is slower, but it's the easiest way */
-   min-width: calc(var(--padding-2) - calc(100% - calc(var(--button-height) * 2)));
    padding: var(--padding-1);
    border-radius: 0;
+   width: 100%;
    border: none;
    cursor: pointer;
    border-left: var(--global-bg) solid 1px;
-   -moz-appearance: textfield; 
+   -moz-appearance: textfield;
 }
 
 .number-field > div > input[type="number"]:focus-visible {
@@ -279,19 +301,130 @@ main {
    margin: 0;
 }
 
-.pattern-str {
+.pattern-str.active,
+.pattern-str 
+{
    display: block;
    margin: 0;
    background-color: var(--button-bg);
    border: var(--button-bg-pressed) solid 1px;
+   margin-bottom: var(--padding-1);
    font-style: normal;
    cursor: pointer;
 }
 
-.pattern-str.selected {
+.pattern-str.active {
+   background-color: var(--button-bg-pressed);
    border: var(--button-bg-pressed) solid 1px;
 }
 
-.pattern-str.selected:hover {
+.pattern-str.active:hover {
+   background-color: var(--button-bg-pressed-hover);
    border: var(--button-bg-pressed-hover) solid 1px;
+}
+
+.rule-str,
+.rule-disabled-str,
+.rule-include-str,
+.rule-exclude-str
+{
+   display: block;
+   margin: 0;
+   margin-bottom: var(--padding-1);
+   font-style: normal;
+}
+
+.rule-str {
+   background-color: var(--rule-none-idle);
+}
+
+.rule-include-str {
+   background-color: var(--rule-include-idle);
+}
+
+.rule-exclude-str {
+   background-color: var(--rule-exclude-idle);
+}
+
+.pattern-str.active > .rule-str {
+   background-color: var(--rule-none);
+}
+
+.pattern-str.active > .rule-include-str {
+   background-color: var(--rule-include);
+}
+
+.pattern-str.active > .rule-exclude-str {
+   background-color: var(--rule-exclude);
+}
+
+.pattern-str.active:hover > .rule-str {
+   background-color: var(--rule-none-idle);
+}
+
+.pattern-str.active:hover > .rule-include-str {
+   background-color: var(--rule-include-idle);
+}
+
+.pattern-str.active:hover > .rule-exclude-str {
+   background-color: var(--rule-exclude-idle);
+}
+
+[class*="face-tag-"] {
+   display: block;
+   font-style: normal;
+}
+
+.face-tag-north {
+   background-color: var(--facetag-north);
+}
+.face-tag-south {
+   background-color: var(--facetag-south);
+}
+.face-tag-west {
+   background-color: var(--facetag-west);
+}
+.face-tag-east {
+   background-color: var(--facetag-east);
+}
+.face-tag-down {
+   background-color: var(--facetag-down);
+}
+.face-tag-up {
+   background-color: var(--facetag-up);
+}
+
+.field-container > details ~ div {
+   background-color: var(--global-bg);
+   padding-top: 0;
+   padding-left: var(--padding-1);
+   padding-right: var(--padding-1);
+   padding-bottom: 0;
+   transition: max-height 125ms ease-in-out, padding-top 125ms ease-in-out, padding-bottom 125ms ease-in-out;
+   max-height: 0;
+   overflow: hidden;
+   border: var(--button-bg) 2px solid;
+}
+
+.field-container > details[open=""] ~ div {
+   padding-top: var(--padding-1);
+   padding-bottom: var(--padding-1);
+   max-height: calc(calc(var(--button-height) * 4) + calc(var(--padding-1) * 4));
+}
+
+.field-container > details > summary {
+   align-content: center;
+   display: block;
+   cursor: pointer;
+   margin-bottom: 0;
+}
+
+.icon {
+   width: var(--button-height);
+   height: var(--button-height);
+   font-style: normal;
+   font-size: larger;
+   align-items: center;
+   --fa-display: inline-flex;
+   justify-content: center;
 }

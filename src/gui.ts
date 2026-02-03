@@ -20,6 +20,43 @@ abstract class AbstractField {
 
 }
 
+class FieldContainer {
+    private containerElement: HTMLDivElement;
+    private detailsElement: HTMLDetailsElement;
+    private contentElement: HTMLDivElement;
+    private fields: AbstractField[];
+
+    constructor(title: string, fields: AbstractField[]) {
+        this.containerElement = document.createElement("div");
+        this.detailsElement = document.createElement("details");
+        this.contentElement = document.createElement("div");
+        this.fields = fields;
+
+        let closedIcon = `<i class="icon fa-solid fa-caret-right"></i>${title}`;
+        let openIcon = `<i class="icon fa-solid fa-caret-down"></i>${title}`
+        let summary = document.createElement("summary");
+        summary.innerHTML = closedIcon;
+        summary.classList = "field";
+
+        this.detailsElement.addEventListener("toggle", () => {
+            let isOpen = this.detailsElement.open;
+            summary.innerHTML = isOpen ? openIcon : closedIcon;
+        })
+        this.containerElement.classList = "field-container";
+        this.detailsElement.appendChild(summary);
+
+        this.containerElement.appendChild(this.detailsElement);
+        this.containerElement.appendChild(this.contentElement);
+    }
+    getDom() {
+        for (let elem of this.fields) {
+            this.contentElement.appendChild(elem.getDom());
+        }
+
+        return this.containerElement;
+    }
+}
+
 class NumberField extends AbstractField {
     private inputElement: HTMLInputElement;
     private incrementButtonElement: HTMLButtonElement;
@@ -87,31 +124,31 @@ class CheckBoxField extends AbstractField {
     private inputElement: HTMLInputElement;
     private fakeBoxElement: HTMLSpanElement;
     private checked: boolean = false;
-    private labels = { off: "", on: ""}
 
-    constructor(off_label?: string, on_label?: string) {
+    constructor(title: string, checked = false) {
         super("checkboxUpdated", "checkbox-field");
+        let offIcon = `<i class="icon fa-regular fa-square"></i>${title}`;
+        let onIcon = `<i class="icon fa-solid fa-square-check"></i>${title}`
 
         this.inputElement = document.createElement("input");
         this.inputElement.type = "checkbox";
 
-        if (off_label) this.labels.off = off_label;
-        if (on_label) this.labels.on = on_label;
-
         this.fakeBoxElement = document.createElement("span");
         this.fakeBoxElement.classList = "checkbox-faker";
-        if (this.labels.off) this.fakeBoxElement.textContent = this.labels.off;
+        this.fakeBoxElement.innerHTML = checked ? onIcon : offIcon;
+
+        this.setCheckedState(checked);
         
         this.element.appendChild(this.inputElement);
         this.element.appendChild(this.fakeBoxElement);
         this.inputElement.addEventListener("change", () => {
             this.checked = this.inputElement.checked;
 
-            if (this.checked && this.labels.on) {
-                this.fakeBoxElement.textContent = this.labels.on;
+            if (this.checked) {
+                this.fakeBoxElement.innerHTML = onIcon;
             }
-            else if (this.labels.off) {
-                this.fakeBoxElement.textContent = this.labels.off;
+            else {
+                this.fakeBoxElement.innerHTML = offIcon;
             }
 
             this.element.dispatchEvent(this.fieldChangedEvent);
@@ -119,6 +156,10 @@ class CheckBoxField extends AbstractField {
     }
     getCheckedState(): boolean {
         return this.checked;
+    }
+    setCheckedState(value: boolean): void {
+        this.inputElement.checked = value;
+        this.checked = value;
     }
 }
 
@@ -256,49 +297,115 @@ const Data = {
     controls: {
         jsonFileField: new JsonFileField(),
         shapesField: new OptionsField("Shape Selector", []),
-        showPatternsField: new CheckBoxField("Showing: Face Tags", "Showing: Patterns"),
-        showFloorGridField: new CheckBoxField("Disable Floor Grid", "Enable Floor Grid"),
-        patternIndexField: new NumberField("Pattern Index")
+        showPatternsField: new CheckBoxField("Show Patterns"),
+        showFloorGridField: new CheckBoxField("Disable Floor Grid"),
+        patternIndexField: new NumberField("Pattern Index"),
+        showFaceTagHighlights: new CheckBoxField("Highlight Facetags", true),
+        showRuleHighlights: new CheckBoxField("Highlight Rules", true)
     },
     updateJsonDisplay: function() {
         let display = document.getElementById("json_display");
         let shape = Data.controls.shapesField.getPickedOption();
-        let patternIndex = Data.controls.patternIndexField.getValue();
+        let indent = 2;
+        let s4 = "  ";
+        let s8 = "    ";
+        let st = "      ";
+        let se = "        ";
+
+        let handleRules = (key: string, potentialRule: any) => {
+            if (key === "RulesToMatch") {
+                let rules = potentialRule as Schema.RuleToMatch[];
+                let type = "rule";
+                
+                let result = "";
+                for (let i = 0; i < rules.length; i++) {
+                    let rule = rules[i];
+                    let data = `data-${type}-index=${i}`;
+                    let clazz = `${type}-str`;
+                    let comma = ",";
+
+                    if (rule.IncludeOrExclude === "Include") clazz = `${type}-include-str`;
+                    if (rule.IncludeOrExclude === "Exclude") clazz = `${type}-exclude-str`;
+                    if (!Data.controls.showRuleHighlights.getCheckedState()) clazz = `${type}-disabled-str`;
+                    if (i == rules.length - 1) comma = "";
+                    
+                    result += `<i class=${clazz} ${data}>${se}${JSON.stringify(rule, null, indent)}${comma}</i>`
+                }
+
+                return `[${result.replaceAll("\n", `<br>${se}`)}${st}]`;
+            }
+            return potentialRule;
+        }
         
+        let handlePatterns = (patterns: Schema.Pattern[]) => {
+            let type = "pattern";
+
+            let result = "";
+            for (let i = 0; i < patterns.length; i++) {
+                let pattern = patterns[i];
+                let data = `data-${type}-index=${i}`;
+                let title = `title="Click me to see ${type} ${i}"`;
+                let clazz = `${type}-str`;
+                let comma = ",";
+
+                let patternIndex = Data.controls.patternIndexField.getValue();
+                if (i === patternIndex) clazz += " active";
+                if (i == patterns.length - 1) comma = "";
+
+                result += `<i class="${clazz}" ${data} ${title}>${s8}${JSON.stringify(pattern, handleRules, indent)}${comma}</i>`;
+            }
+             
+            let finalresult = `[${result.replaceAll("\n", `<br>${s8}`)}${s4}]`;
+            finalresult = finalresult.replaceAll("\\n", `<br>${st}`);
+            finalresult = finalresult.replaceAll("\\\"", `"`);
+
+            return finalresult
+        }
+
+        let replacer = (key: string, value: any) => {
+            if (key === "PatternsToMatchAnyOf") {
+                let patterns = value as Schema.Pattern[];
+                return handlePatterns(patterns);
+            }
+            if (key === "FaceTags" && Data.controls.showFaceTagHighlights.getCheckedState()) {
+                let faceTags = value as Schema.FaceTags;
+
+                
+                let faceTagStrs: string[] = [];
+                let tryAddDirection = (dir: string, arr: string[] | undefined, comma = false) => { 
+                    let c = ",";
+                    if (!comma) c = "";
+
+                    if (arr) {
+                        faceTagStrs.push(`<i class="face-tag-${dir.toLowerCase()}">${s8}"${dir}": ${JSON.stringify(arr, null, indent)}${c}</i>`);
+                    }
+                }
+                tryAddDirection("North", faceTags.North, Boolean(faceTags.South));
+                tryAddDirection("South", faceTags.South, Boolean(faceTags.West));
+                tryAddDirection("West", faceTags.West, Boolean(faceTags.East));
+                tryAddDirection("East", faceTags.East, Boolean(faceTags.Down));
+                tryAddDirection("Down", faceTags.Down, Boolean(faceTags.Up));
+                tryAddDirection("Up", faceTags.Up);
+
+                return `{<br>${faceTagStrs.join("")}${s4}}`.replaceAll("\n", `<br>${s8}`);
+            }
+
+            return value;
+        }
+
         if (Data.cachedJson.obj && display) {
             let json = Data.cachedJson.obj as Schema.CustomConnectedBlockTemplateAsset;
             let shapeObj = json.Shapes![shape];
-            
-            // Collect patterns in a new array, to avoid parasiting the original
-            let patternList: Schema.Pattern[] = [];
-            if (shapeObj.PatternsToMatchAnyOf) {
-                patternList.push(...shapeObj.PatternsToMatchAnyOf);
-            }
 
-            // Concatenate all patterns into a HTML string, to be re-appended in place of the unstyled block.
-            let patternStr: string = "";
-            for (let i = 0; i < patternList.length; i++) {
-                let clazz = "pattern-str";
-                let comma = ",";
+            // Fattest strigify around, followed by its ugly replaceAll chain to rectify the strigify's output
+            let jsonString = JSON.stringify(shapeObj, replacer, indent);
+            jsonString = jsonString.replaceAll("\\\"", `"`); // remove \" where it occurs 
+            jsonString = jsonString.replaceAll(`"[`, "["); // remove "[ where it occurs 
+            jsonString = jsonString.replaceAll(`]"`, "]"); // remove ]" where it occurs 
+            jsonString = jsonString.replaceAll(`"{`, "{"); // remove "{ where it occurs 
+            jsonString = jsonString.replaceAll(`}"`, "}"); // remove }" where it occurs 
 
-                if (i == patternIndex) clazz += " selected";
-                if (i == patternList.length - 1) comma = "";
-
-                let data = `data-pattern-index=${i}`;
-                let title = `title="Click me to see pattern ${i}"`;
-
-                patternStr += `<i class="${clazz}" ${data} ${title}>        ${JSON.stringify(patternList[i], null, 4)}${comma}</i>`;
-            }
-
-            // Stringify original and split patterns off
-            let shapeStr: string = JSON.stringify(shapeObj, null, 4);
-            let split = shapeStr.split("\"PatternsToMatchAnyOf\"");
-
-            // Make strings more HTML-friendly, and add back leading spaces for patterns
-            let splitStr = split[0].replaceAll("\n", "<br>");
-            patternStr = patternStr.replaceAll("\n", "<br>        ");
-
-            display.innerHTML = `${splitStr}"PatternsToMatchAnyOf": [<br>${patternStr}    ]<br>}`;
+            display.innerHTML = jsonString;
         }
 
         let patternElements = document.querySelectorAll(".pattern-str") as NodeListOf<HTMLLIElement>;
@@ -341,14 +448,20 @@ function initControls() {
     // Read shapes trigger
     Data.controls.shapesField.addChangedListener(Data.updateJsonDisplay);
     Data.controls.patternIndexField.addChangedListener(Data.updateJsonDisplay);
+    Data.controls.showFaceTagHighlights.addChangedListener(Data.updateJsonDisplay);
+    Data.controls.showRuleHighlights.addChangedListener(Data.updateJsonDisplay);
 
     // Add fields to panel
     let fields = [];
     fields.push(Data.controls.jsonFileField);
     fields.push(Data.controls.shapesField);
     fields.push(Data.controls.showPatternsField);
-    fields.push(Data.controls.showFloorGridField);
     fields.push(Data.controls.patternIndexField);
+    fields.push(new FieldContainer("Further Options", [
+        Data.controls.showFloorGridField,
+        Data.controls.showFaceTagHighlights,
+        Data.controls.showRuleHighlights
+    ]));
     fields.forEach((field) => form.appendChild(field.getDom()));
 }
 
