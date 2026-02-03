@@ -233,8 +233,6 @@ main {
    padding-right: var(--padding-1);
    padding-top: var(--padding-1);
    border-top: #777 solid 2px;
-   text-overflow: clip;
-   overflow: hidden;
 }
 
 .checkbox-field {
