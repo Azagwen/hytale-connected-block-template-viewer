@@ -102,6 +102,8 @@ main {
    display: flex;
    align-items: center;
    flex-direction: row;
+   text-overflow: clip;
+   overflow: hidden;
 }
 
 .json-input {
@@ -121,6 +123,8 @@ main {
    background-color: var(--button-bg);
    margin-right: var(--padding-1);
    border-right: var(--global-bg) solid 1px;
+   text-overflow: clip;
+   overflow: hidden;
 }
 
 .json-reload-button
@@ -161,6 +165,8 @@ main {
    flex-grow: 1;
    border-left: var(--global-bg) solid 1px;
    background-color: var(--button-bg);
+   text-overflow: clip;
+   overflow: hidden;
 }
 
 .select-field-title {
@@ -168,6 +174,8 @@ main {
    width: 100%;
    padding-left: var(--padding-1);
    align-content: center;
+   text-overflow: clip;
+   overflow: hidden;
 }
 
 .field-container > summary:hover,
@@ -225,6 +233,8 @@ main {
    padding-right: var(--padding-1);
    padding-top: var(--padding-1);
    border-top: #777 solid 2px;
+   text-overflow: clip;
+   overflow: hidden;
 }
 
 .checkbox-field {
@@ -249,6 +259,8 @@ main {
    width: 100%;
    background-color: var(--button-bg);
    align-content: center;
+   text-overflow: clip;
+   overflow: hidden;
 }
 
 .number-field {
@@ -256,6 +268,7 @@ main {
    flex-direction: row;
    justify-content: space-between;
    align-items: center;
+   overflow: hidden;
 }
 
 .number-field > div {
@@ -268,6 +281,8 @@ main {
 .number-field > label {
    flex-grow: 1;
    padding-left: var(--padding-1);
+   text-overflow: clip;
+   overflow: hidden;
 }
 
 .number-field > div > button {
@@ -420,6 +435,8 @@ main {
    display: block;
    cursor: pointer;
    margin-bottom: 0;
+   text-overflow: clip;
+   overflow: hidden;
 }
 
 .field .icon {
