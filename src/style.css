@@ -134,9 +134,9 @@ main {
    border-radius: 0;
    border: none;
    background-color: var(--button-bg);
-   font-size: large;
    cursor: pointer;
    padding: 0;
+   color: black;
 }
 
 .field {
@@ -290,6 +290,7 @@ main {
    cursor: pointer;
    background-color: var(--button-bg);
    border-left: var(--global-bg) solid 1px;
+   padding: 0;
 }
 
 .number-field > div > input[type="number"] {

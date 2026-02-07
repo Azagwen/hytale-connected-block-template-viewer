@@ -2,6 +2,8 @@ import * as THREE from "three";
 import * as View from "./viewport";
 import * as GUI from "./gui";
 import type * as Schema from "./@types/custom_connected_block_template";
+import { createRoot } from "react-dom/client";
+import { NumberField } from "./elements";
 
 function unpackFaceTags(faceTags: any): (string | null)[] {
     let up: string | null = faceTags?.Up?.join("<br>");
