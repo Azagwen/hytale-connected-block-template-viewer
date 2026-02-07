@@ -1,5 +1,7 @@
 import React, { useState, type ChangeEvent } from "react";
 
+//TODO: Figure out how to dispatch events to the THREEjs Scene from React
+
 function FaRegularIcon({ iconName }: { iconName: string }) {
     return <i className={`icon fa-regular fa-${iconName}`}></i>
 }
@@ -99,73 +101,19 @@ function JsonFileField() {
     )
 }
 
-/*
-class JsonFileField extends AbstractField {
-    private jsonContent?: string;
-    private lastFile?: File;
-    private inputElement: HTMLInputElement;
-    private reloadButton: HTMLButtonElement;
-
-    constructor() {
-        super("jsonDelivered", "json-field");
-
-        this.inputElement = document.createElement("input")
-        this.inputElement.accept = ".json";
-        this.inputElement.type = "file";
-        this.inputElement.multiple = false;
-        this.inputElement.classList = "json-input"
-
-        this.reloadButton = document.createElement("button");
-        this.reloadButton.textContent = "⟳";
-        this.reloadButton.type = "button";
-        this.reloadButton.classList = "json-reload-button"
-        this.reloadButton.disabled = true;
-
-        this.element.appendChild(this.inputElement);
-        this.element.appendChild(this.reloadButton);
-
-        this.inputElement.addEventListener("change", () => {
-            let file = this.getCurrentInputFile();
-            
-            if (file) {
-                this.lastFile = file;
-                this.loadFile();
-                this.reloadButton.disabled = false;
-            }
-        }); 
-        this.reloadButton.onclick = () => {
-            if (this.lastFile) {
-                this.loadFile();
-            }
-        };
-    }
-    private loadFile() {
-        let file = this.getCurrentInputFile();
-        let reader = new FileReader();
-
-        reader.addEventListener("load", (event) => {
-            let bfile = event.target?.result;
-             if (typeof bfile === "string") {
-                this.jsonContent = bfile;
-                this.element.dispatchEvent(this.fieldChangedEvent);
-            }
-        });
-
-        if (file) reader.readAsText(file);
-    }
-    getCurrentInputFile(): File | null | undefined {
-        return this.inputElement.files?.item(0);
-    }
-    getJsonContent(): string {
-        if (this.jsonContent) return this.jsonContent;
-        return "";
-    }
+function JsonDisplay() {
+    return (
+        <>
+            <p id="json-display-title">Shape JSON view</p>
+            <div id="json-display"></div>
+        </>
+    )
 }
-*/
 
 export {
     NumberField,
     CheckBoxField,
     OptionsField,
-    JsonFileField
+    JsonFileField,
+    JsonDisplay
 }
