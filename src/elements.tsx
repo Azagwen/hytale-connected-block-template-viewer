@@ -1,3 +1,4 @@
+import { array } from "three/tsl";
 import type * as Schema from "./@types/custom_connected_block_template";
 import React, { useState, type ChangeEvent } from "react";
 
@@ -153,8 +154,21 @@ type patternDisplay = {
     footer: string;
 }
 
-type shapeDisplay = { 
+type faceTagArrDisplay = { 
+    string: string; 
+    direction: string;
+}
+
+type faceTagDisplay = { 
     header: string;
+    faceTagsKey: string;
+    faceTags: faceTagArrDisplay[];
+    faceTagsFooter: string;
+    footer: string;
+}
+
+type shapeDisplay = { 
+    header: faceTagDisplay;
     patternsKey: string;
     patterns: patternDisplay[];
     patternsFooter: string;
@@ -162,11 +176,19 @@ type shapeDisplay = {
 }
 
 function JsonDisplay({ patternClicked, content, shape, patternIndex }: JsonDisplaySettings) {
-    const faceTagsKeyRegex = /(?<![ ]+)(  \"FaceTags": \{\n)([a-zA-Z0-9\,\"\[\]\s\n:?!]+)(  \})/gm;
+    const faceTagsKeyRegex = /(?<![ ]+)(  \"FaceTags": \{\n)([a-zA-Z0-9\,\"\[\]\s\n:?!]+)(  \}[\,]?)/gm;
+    const faceTagArrDelimiterRegex = /(?<=    \]),\n(?=    (?:\")?)/gm;
     const patternsKeyRegex = /(  \"PatternsToMatchAnyOf": \[\n)([\D\d]+)(  \]\n)/gm;
     const patternObjDelimiterRegex = /(?:(?<![ ]+)(?<=    \}),\n(?=    \{))/gm;
     const rulesKeyRegex = /(      \"RulesToMatch": \[\n)([\D\d]+)(      \]\n)/gm;
     const ruleObjDelimiterRegex = /(?:(?<![ ]+)(?<=        \}),\n(?=        \{))/gm;
+
+    const faceTagNorthRegex = /(    \"North\": \[\n)/gm;
+    const faceTagSouthRegex = /(    \"South\": \[\n)/gm;
+    const faceTagWestRegex = /(    \"West\": \[\n)/gm;
+    const faceTagEastRegex = /(    \"East\": \[\n)/gm;
+    const faceTagDownRegex = /(    \"Down\": \[\n)/gm;
+    const faceTagUpRegex = /(    \"Up\": \[\n)/gm;
 
     // Do I need to explain this?
     const getShapeObj = () => {
@@ -181,7 +203,42 @@ function JsonDisplay({ patternClicked, content, shape, patternIndex }: JsonDispl
         const string = JSON.stringify(getShapeObj(), null, 2);
         const subStr = string.split(patternsKeyRegex);
 
-        // Gather patterns for this shape.
+        let faceTagDisplay: faceTagDisplay = { header: "", faceTagsKey: "", faceTags: [], faceTagsFooter: "", footer: "" };
+        if (subStr[0]) {
+            let faceTagSubStr = subStr[0].split(faceTagsKeyRegex);
+
+            // Split our facetag block string into its individual values
+            let arrDisplays: faceTagArrDisplay[] = [];
+            if (faceTagSubStr[2]) {
+                let faceTagStrings = faceTagSubStr[2].split(faceTagArrDelimiterRegex);
+
+                // Gather Facetag display data
+                for (let i = 0; i < faceTagStrings.length; i++) {
+                    let faceTagString = faceTagStrings[i];
+                    let direction = "";
+
+                    // Match our facetag JSON string's key against each possible direction
+                    if (faceTagString.match(faceTagNorthRegex)) direction = "North";
+                    else if (faceTagString.match(faceTagSouthRegex)) direction = "South";
+                    else if (faceTagString.match(faceTagWestRegex)) direction = "West";
+                    else if (faceTagString.match(faceTagEastRegex)) direction = "East";
+                    else if (faceTagString.match(faceTagDownRegex)) direction = "Down";
+                    else if (faceTagString.match(faceTagUpRegex)) direction = "Up";
+
+                    arrDisplays.push({ string: faceTagString, direction: direction });
+                }
+            }
+
+            faceTagDisplay = {
+                header: faceTagSubStr[0],
+                faceTagsKey: faceTagSubStr[1],
+                faceTags: arrDisplays,
+                faceTagsFooter: faceTagSubStr[3],
+                footer: faceTagSubStr[4],
+            }
+        }
+
+        // Gather pattern display data for this shape.
         let patterns: patternDisplay[] = [];
         if (subStr[2]) {
             let patternStrings = subStr[2].split(patternObjDelimiterRegex);
@@ -189,7 +246,7 @@ function JsonDisplay({ patternClicked, content, shape, patternIndex }: JsonDispl
             for (let i = 0; i < patternStrings.length; i++) {
                 let patternSubStr = patternStrings[i].split(rulesKeyRegex);
 
-                // Gather rules for this pattern.
+                // Gather rule display data for this pattern.
                 let rules: ruleDisplay[] = [];
                 if (patternSubStr[2]) {
                     let ruleStrings = patternSubStr[2].split(ruleObjDelimiterRegex);
@@ -210,11 +267,9 @@ function JsonDisplay({ patternClicked, content, shape, patternIndex }: JsonDispl
             }
         };
 
-        console.log(subStr[0])
-
         // Build shape display type from our above data.
         return {
-            header: subStr[0], 
+            header: faceTagDisplay, 
             patternsKey: subStr[1],
             patterns: patterns,
             patternsFooter: subStr[3], 
@@ -227,7 +282,16 @@ function JsonDisplay({ patternClicked, content, shape, patternIndex }: JsonDispl
         <>
             <p id="json-display-title">Shape JSON view</p>
             <div id="json-display">
-                {shapeString.header}
+                {shapeString.header.header}
+                {shapeString.header.faceTagsKey}
+                {shapeString.header.faceTags.map((data, index) => { // Create face tag elements colored as their direction.
+                    let isLast = index == (shapeString.header.faceTags.length - 1);
+                    let comma = isLast ? "" : ",";
+
+                    return <i className={`face-tag-${data.direction.toLowerCase()}`}>{data.string}{comma}</i>
+                })}
+                {shapeString.header.faceTagsFooter}
+                {shapeString.header.footer}
                 {shapeString.patternsKey}
                 {shapeString.patterns.map((pattern, index) => { // Create clickable pattern elements to aid navigation in a user friendly way.
                     let isLast = index == (shapeString.patterns.length - 1);
@@ -238,8 +302,10 @@ function JsonDisplay({ patternClicked, content, shape, patternIndex }: JsonDispl
                     return <i className={"pattern-str" + activeSuffix} title={title} onClick={() => patternClicked(index)}>
                         {pattern.header}
                         {pattern.rulesKey}
-                        {pattern.rules.map((data) => { // Create rule elements based on the rule's inclusive or exclusive nature.
+                        {pattern.rules.map((data, index) => { // Create rule elements based on the rule's inclusive or exclusive nature.
+                            let isLast = index == (pattern.rules.length - 1);
                             let className = "rule-str";
+                            let comma = isLast ? "" : ",";
 
                             if (data.object.IncludeOrExclude !== undefined) {
                                 switch (data.object.IncludeOrExclude) {
@@ -248,7 +314,7 @@ function JsonDisplay({ patternClicked, content, shape, patternIndex }: JsonDispl
                                 }
                             }
 
-                            return <i className={className}>{data.string}</i>
+                            return <i className={className}>{data.string}{comma}</i>
                         })}
                         {pattern.rulesFooter}
                         {pattern.footer}

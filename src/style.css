@@ -393,6 +393,11 @@ main {
 [class*="face-tag-"] {
    display: block;
    font-style: normal;
+   margin-bottom: 2px;
+}
+
+[class*="face-tag-"]:last-of-type {
+   margin-bottom: 0;
 }
 
 .face-tag-north {
