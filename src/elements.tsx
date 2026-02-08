@@ -140,7 +140,29 @@ type JsonDisplaySettings = {
     patternIndex: number;
 }
 
+type ruleDisplay = { 
+    string: string; 
+    object: Schema.RuleToMatch;
+}
+
+type patternDisplay = { 
+    header: string;
+    rulesKey: string;
+    rules: ruleDisplay[];
+    rulesFooter: string;
+    footer: string;
+}
+
+type shapeDisplay = { 
+    header: string;
+    patternsKey: string;
+    patterns: patternDisplay[];
+    patternsFooter: string;
+    footer: string;
+}
+
 function JsonDisplay({ patternClicked, content, shape, patternIndex }: JsonDisplaySettings) {
+    const faceTagsKeyRegex = /(?<![ ]+)(  \"FaceTags": \{\n)([a-zA-Z0-9\,\"\[\]\s\n:?!]+)(  \})/gm;
     const patternsKeyRegex = /(  \"PatternsToMatchAnyOf": \[\n)([\D\d]+)(  \]\n)/gm;
     const patternObjDelimiterRegex = /(?:(?<![ ]+)(?<=    \}),\n(?=    \{))/gm;
     const rulesKeyRegex = /(      \"RulesToMatch": \[\n)([\D\d]+)(      \]\n)/gm;
@@ -155,28 +177,48 @@ function JsonDisplay({ patternClicked, content, shape, patternIndex }: JsonDispl
     }
 
     // Use Regex to slice our JSON into pieces we can use inside HTML elements :)
-    const getShapeString = () => {
+    const getShapeString = (): shapeDisplay => {
         const string = JSON.stringify(getShapeObj(), null, 2);
         const subStr = string.split(patternsKeyRegex);
 
-        let patterns: string[] = [];
-        let rulesDict: {[k: number]: Schema.RuleToMatch[]} = {};
+        // Gather patterns for this shape.
+        let patterns: patternDisplay[] = [];
         if (subStr[2]) {
-            patterns = subStr[2].split(patternObjDelimiterRegex);
-            for (let i = 0; i < patterns.length; i++) {
-                let rulesBlock = patterns[i].split(rulesKeyRegex)[2];
+            let patternStrings = subStr[2].split(patternObjDelimiterRegex);
 
-                rulesDict[i] = rulesBlock.split(ruleObjDelimiterRegex).map((str) => JSON.parse(str));
+            for (let i = 0; i < patternStrings.length; i++) {
+                let patternSubStr = patternStrings[i].split(rulesKeyRegex);
+
+                // Gather rules for this pattern.
+                let rules: ruleDisplay[] = [];
+                if (patternSubStr[2]) {
+                    let ruleStrings = patternSubStr[2].split(ruleObjDelimiterRegex);
+
+                    for (let i = 0; i < ruleStrings.length; i++) {
+                        rules.push({ string: ruleStrings[i], object: JSON.parse(ruleStrings[i]) })
+                    }
+                }
+
+                // Build pattern display type after Gathering rules (or skipping them).
+                patterns[i] = {
+                    header: patternSubStr[0],
+                    rulesKey: patternSubStr[1],
+                    rules: rules,
+                    rulesFooter: patternSubStr[3],
+                    footer: patternSubStr[4]
+                };
             }
         };
 
+        console.log(subStr[0])
+
+        // Build shape display type from our above data.
         return {
             header: subStr[0], 
             patternsKey: subStr[1],
-            patterns: patterns, 
-            rulesMap: rulesDict, 
-            patternsCloser: subStr[3], 
-            jsonCloser: subStr[4]
+            patterns: patterns,
+            patternsFooter: subStr[3], 
+            footer: subStr[4]
         };
     }
 
@@ -187,17 +229,35 @@ function JsonDisplay({ patternClicked, content, shape, patternIndex }: JsonDispl
             <div id="json-display">
                 {shapeString.header}
                 {shapeString.patternsKey}
-
-                {shapeString.patterns.map((string, index) => {
+                {shapeString.patterns.map((pattern, index) => { // Create clickable pattern elements to aid navigation in a user friendly way.
                     let isLast = index == (shapeString.patterns.length - 1);
                     let activeSuffix = (index == patternIndex ? " active" : "");
                     let comma = isLast ? "" : ",";
+                    let title = `Click me to see pattern ${index + 1}`;
                     
-                    return <i className={"pattern-str" + activeSuffix} onClick={() => patternClicked(index)}>{string}{comma}</i>
-                })}
+                    return <i className={"pattern-str" + activeSuffix} title={title} onClick={() => patternClicked(index)}>
+                        {pattern.header}
+                        {pattern.rulesKey}
+                        {pattern.rules.map((data) => { // Create rule elements based on the rule's inclusive or exclusive nature.
+                            let className = "rule-str";
 
-                {shapeString.patternsCloser}
-                {shapeString.jsonCloser}
+                            if (data.object.IncludeOrExclude !== undefined) {
+                                switch (data.object.IncludeOrExclude) {
+                                    case "Exclude": className = "rule-exclude-str"; break;
+                                    case "Include": className = "rule-include-str"; break;
+                                }
+                            }
+
+                            return <i className={className}>{data.string}</i>
+                        })}
+                        {pattern.rulesFooter}
+                        {pattern.footer}
+
+                        {comma}
+                    </i>
+                })}
+                {shapeString.patternsFooter}
+                {shapeString.footer}
             </div>
         </>
     )
