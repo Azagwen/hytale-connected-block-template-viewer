@@ -116,3 +116,7 @@ function main() {
 }
 
 main();
+
+export {
+    updateScene
+}

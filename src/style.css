@@ -27,6 +27,8 @@
 
    --button-height: 4vh;
    --header-height: 7.5vh;
+
+   --controls-width: 30vw;
 }
 
 html, body {
@@ -75,12 +77,12 @@ main {
 
 #viewport {
    display: inline-block;
-   width: 75vw;
+   width: calc(100vw - var(--controls-width));
    height: 100%;
 }
 
 #controls {
-   width: 25vw;
+   width: var(--controls-width);
    height: 100%;
    display: flex;
    flex-direction: column;
@@ -215,7 +217,7 @@ main {
    overflow-y: scroll;
    margin: var(--padding-1);
    padding: var(--padding-1);
-   white-space: pre-wrap;
+   white-space: pre;
    background-color: var(--button-bg);
    font-family: "Noto Sans Mono", monospace;
    font-optical-sizing: auto;
@@ -322,9 +324,13 @@ main {
    margin: 0;
    background-color: var(--button-bg);
    border: var(--button-bg-pressed) solid 1px;
-   margin-bottom: var(--padding-1);
+   margin-bottom: 2px;
    font-style: normal;
    cursor: pointer;
+}
+
+.pattern-str:last-child {
+   margin-bottom: 0;
 }
 
 .pattern-str.active {
@@ -448,4 +454,12 @@ main {
    justify-content: center;
    border-right: var(--global-bg) solid 1px;
    margin-right: var(--padding-1);
+}
+
+.test-formatting {
+   display: block;
+   margin: 0;
+   font-style: normal;
+   background-color: var(--button-bg-pressed);
+   margin-bottom: 2px;
 }
