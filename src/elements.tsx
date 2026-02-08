@@ -1,4 +1,3 @@
-import { array } from "three/tsl";
 import type * as Schema from "./@types/custom_connected_block_template";
 import React, { useState, type ChangeEvent } from "react";
 
@@ -175,6 +174,7 @@ type shapeDisplay = {
     footer: string;
 }
 
+// This element is very prone to crashing the entire DOM, will need to debug toroughly
 function JsonDisplay({ patternClicked, content, shape, patternIndex }: JsonDisplaySettings) {
     const faceTagsKeyRegex = /(?<![ ]+)(  \"FaceTags": \{\n)([a-zA-Z0-9\,\"\[\]\s\n:?!]+)(  \}[\,]?)/gm;
     const faceTagArrDelimiterRegex = /(?<=    \]),\n(?=    (?:\")?)/gm;
