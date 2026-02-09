@@ -23,6 +23,7 @@
 
    --padding-1: 1vh;
    --padding-2: 2vh;
+   --padding-3: 3vh;
    --padding-4: 4vh;
 
    --button-height: 4vh;
@@ -317,14 +318,10 @@ main {
    margin: 0;
 }
 
-.pattern-str.active,
-.pattern-str 
-{
-   display: block;
-   margin: 0;
+.pattern-str {
    background-color: var(--button-bg);
    border: var(--button-bg-pressed) solid 1px;
-   margin-bottom: 2px;
+   margin-bottom: 2px !important;
    font-style: normal;
    cursor: pointer;
 }
@@ -348,9 +345,7 @@ main {
 .rule-include-str,
 .rule-exclude-str
 {
-   display: block;
-   margin: 0;
-   margin-bottom: 2px;
+   margin-bottom: 2px !important;
    font-style: normal;
 }
 
@@ -467,4 +462,17 @@ main {
    font-style: normal;
    background-color: var(--button-bg-pressed);
    margin-bottom: 2px;
+}
+
+.indent-block {
+   display: block;
+   padding: 0;
+   margin: 0;
+   margin-left: var(--padding-2);
+}
+
+.flush-block {
+   display: block;
+   padding: 0;
+   margin: 0;
 }

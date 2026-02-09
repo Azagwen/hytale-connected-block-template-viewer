@@ -133,6 +133,178 @@ function JsonFileField({ changedCallback }: JsonFieldSettings) {
     )
 }
 
+type KeyedStringListSettings = {
+    listKey: string;
+    list: string[] | undefined;
+    flush?: boolean;
+    addComma?: boolean;
+    classes?: string[];
+}
+
+function KeyedStringList({ listKey, list, addComma = false, classes = [], flush = true }: KeyedStringListSettings) {
+    if (!list) return (<></>);
+
+    const comma = addComma ? "," : "";
+    const entries = list.map((tag, index) => {
+        let isLast = (index == (list.length - 1));
+        let comma = isLast ? "" : ",";
+
+        return <p className="indent-block">"{tag}"{comma}<br /></p>;
+    })
+
+    const clazz = [(flush ? "flush-block" : "indent-block")]
+    clazz.push(...classes);
+
+    return (
+        <li className={clazz.join(" ")}>
+            "{listKey}": {"["}
+            {entries}
+            {"]"}{comma}
+        </li>
+    )
+}
+
+type FaceTagBlockSettings = {
+    content: Schema.FaceTags | undefined;
+    flush: boolean;
+    highlight: boolean;
+}
+
+function FaceTagList({ content, flush, highlight }: FaceTagBlockSettings) {
+    if (!content) return (<></>);
+    const tagsObj = (content as any);
+
+    const keys = ["North", "South", "West", "East", "Down", "Up"];
+    const foundKeys = keys.map((key) => {
+        if (key in content) return key;
+    });
+    const entries = foundKeys.map((key, index) => {
+        if (!key) return (<></>);
+        let isLast = (index == (foundKeys.length - 1));
+        let clazz = highlight ? `face-tag-${key.toLowerCase()} ` : "";
+
+        return <KeyedStringList listKey={key!} list={tagsObj[key!]} classes={[clazz]} addComma={!isLast} flush={false} />;
+    });
+
+    return (
+        <ul className={flush ? "flush-block" : "indent-block"}>
+            "FaceTags": {"{"}
+            {entries}
+            {"}"}
+        </ul>
+    )
+}
+
+type PatternRuleBlockSettings = {
+    rule: Schema.RuleToMatch | undefined;
+    addComma: boolean;
+    highlight?: boolean;
+}
+
+function PatternRuleBlock({ rule, addComma, highlight = true }: PatternRuleBlockSettings) {
+    if (!rule) return (<></>);
+    const comma = addComma ? "," : "";
+
+    let className = "rule-str";
+    if (rule.IncludeOrExclude === "Include") className = "rule-include-str";
+    if (rule.IncludeOrExclude === "Exclude") className = "rule-exclude-str";
+    if (!highlight) className = "";
+
+    return (
+        <li className={`${className} indent-block`}>
+            {"{"}
+            <ul className="indent-block">
+                "Position": {"{"}
+                <li className="indent-block">"X": {rule.Position?.X ? rule.Position.X : 0},</li>
+                <li className="indent-block">"Y": {rule.Position?.Y ? rule.Position.Y : 0},</li>
+                <li className="indent-block">"Z": {rule.Position?.Z ? rule.Position.Z : 0}</li>
+                {"}"}, <br />
+                "IncludeOrExclude": "{rule.IncludeOrExclude}", <br />
+                <FaceTagList content={rule.FaceTags} flush={true} highlight={false} />
+                <KeyedStringList listKey="BlockTypes" list={rule.BlockTypes} />{}
+                <KeyedStringList listKey="BlockTypeLists" list={rule.BlockTypeLists} />{}
+                <KeyedStringList listKey="Shapes" list={rule.Shapes} />{}
+                {/* {rule.PlacementNormals} */}
+            </ul>
+            {"}"}{comma}
+        </li>
+    )
+}
+
+type PatternRuleListSettings = {
+    rules: Schema.RuleToMatch[] | undefined;
+}
+
+function PatternRuleList({ rules }: PatternRuleListSettings) {
+    if (!rules) return (<></>);
+
+    const entries = rules.map((rule, index) => {
+        let isLast = (index == (rules.length - 1));
+
+        return <PatternRuleBlock rule={rule} addComma={!isLast} />
+    })
+
+    return (
+        <ul className="flush-block">
+            "RulesToMatch": {"["}
+            {entries}
+            {"]"}
+        </ul>
+    )
+}
+
+type PatternBlockSettings = {
+    patternClicked: (index: number) => {};
+    pattern: Schema.Pattern;
+    isLast: boolean;
+    index: number;
+    activeIndex: number;
+}
+
+function PatternBlock({ patternClicked, pattern, isLast, index, activeIndex }: PatternBlockSettings) {
+    const comma = isLast ? "" : ",";
+    const activeClass = (activeIndex == index) ? "active" : "";
+
+    return (
+        <section className={`indent-block pattern-str ${activeClass}`} onClick={() => patternClicked(index)}>
+            {"{"}
+            <section className="indent-block">
+                "Type": "{pattern.Type}", <br />
+                "RequireFaceTagsMatchingRoll": {pattern.RequireFaceTagsMatchingRoll ? "true" : "false"}, <br />
+                "TransformRulesToOrientation": {pattern.TransformRulesToOrientation ? "true" : "false"}, <br />
+                "YawToApplyAddReplacedBlockType": "{pattern.YawToApplyAddReplacedBlockType}", <br />
+                <PatternRuleList rules={pattern.RulesToMatch} />
+            </section>
+            {"}"}{comma}
+        </section>
+    );
+}
+
+type PatternListSettings = {
+    patternClicked: (index: number) => {};
+    patterns: Schema.Pattern[] | undefined
+    activeIndex: number;
+}
+
+function PatternList({ patternClicked, patterns, activeIndex }: PatternListSettings) {
+    if (!patterns) return (<></>);
+
+    const entries = patterns.map((pattern, index) => {
+        let isLast = (index == (patterns.length - 1));
+
+        return <PatternBlock patternClicked={patternClicked} pattern={pattern} isLast={isLast} index={index} activeIndex={activeIndex} />;
+    })
+        
+    return (
+        <ul className="indent-block">
+            "PatternsToMatchAnyOf": {"["}
+            {entries}
+            {"]"}
+        </ul>
+    )
+
+}
+
 type JsonDisplaySettings = {
     patternClicked: (index: number) => {};
     content: Schema.CustomConnectedBlockTemplateAsset;
@@ -140,194 +312,22 @@ type JsonDisplaySettings = {
     patternIndex: number;
 }
 
-type ruleDisplay = { 
-    string: string; 
-    object: Schema.RuleToMatch;
-}
-
-type patternDisplay = { 
-    header: string;
-    rulesKey: string;
-    rules: ruleDisplay[];
-    rulesFooter: string;
-    footer: string;
-}
-
-type faceTagArrDisplay = { 
-    string: string; 
-    direction: string;
-}
-
-type faceTagDisplay = { 
-    header: string;
-    faceTagsKey: string;
-    faceTags: faceTagArrDisplay[];
-    faceTagsFooter: string;
-    footer: string;
-}
-
-type shapeDisplay = { 
-    header: faceTagDisplay;
-    patternsKey: string;
-    patterns: patternDisplay[];
-    patternsFooter: string;
-    footer: string;
-}
-
-// This element is very prone to crashing the entire DOM, will need to debug toroughly
 function JsonDisplay({ patternClicked, content, shape, patternIndex }: JsonDisplaySettings) {
-    const faceTagsKeyRegex = /(?<![ ]+)(  \"FaceTags": \{\n)([a-zA-Z0-9\,\"\[\]\s\n:?!]+)(  \}[\,]?)/gm;
-    const faceTagArrDelimiterRegex = /(?<=    \]),\n(?=    (?:\")?)/gm;
-    const patternsKeyRegex = /(  \"PatternsToMatchAnyOf": \[\n)([\D\d]+)(  \]\n)/gm;
-    const patternObjDelimiterRegex = /(?:(?<![ ]+)(?<=    \}),\n(?=    \{))/gm;
-    const rulesKeyRegex = /(      \"RulesToMatch": \[\n)([\D\d]+)(      \]\n)/gm;
-    const ruleObjDelimiterRegex = /(?:(?<![ ]+)(?<=        \}),\n(?=        \{))/gm;
+    const shapeObj: Schema.Shape = content.Shapes ? content.Shapes![shape] : {};
 
-    const faceTagNorthRegex = /(    \"North\": \[\n)/gm;
-    const faceTagSouthRegex = /(    \"South\": \[\n)/gm;
-    const faceTagWestRegex = /(    \"West\": \[\n)/gm;
-    const faceTagEastRegex = /(    \"East\": \[\n)/gm;
-    const faceTagDownRegex = /(    \"Down\": \[\n)/gm;
-    const faceTagUpRegex = /(    \"Up\": \[\n)/gm;
-
-    // Do I need to explain this?
-    const getShapeObj = () => {
-        if (content.Shapes && shape) {
-            return {... content.Shapes[shape]};
-        }
-        return {};
-    }
-
-    // Use Regex to slice our JSON into pieces we can use inside HTML elements :)
-    const getShapeString = (): shapeDisplay => {
-        const string = JSON.stringify(getShapeObj(), null, 2);
-        const subStr = string.split(patternsKeyRegex);
-
-        let faceTagDisplay: faceTagDisplay = { header: "", faceTagsKey: "", faceTags: [], faceTagsFooter: "", footer: "" };
-        if (subStr[0]) {
-            let faceTagSubStr = subStr[0].split(faceTagsKeyRegex);
-
-            // Split our facetag block string into its individual values
-            let arrDisplays: faceTagArrDisplay[] = [];
-            if (faceTagSubStr[2]) {
-                let faceTagStrings = faceTagSubStr[2].split(faceTagArrDelimiterRegex);
-
-                // Gather Facetag display data
-                for (let i = 0; i < faceTagStrings.length; i++) {
-                    let faceTagString = faceTagStrings[i];
-                    let direction = "";
-
-                    // Match our facetag JSON string's key against each possible direction
-                    if (faceTagString.match(faceTagNorthRegex)) direction = "North";
-                    else if (faceTagString.match(faceTagSouthRegex)) direction = "South";
-                    else if (faceTagString.match(faceTagWestRegex)) direction = "West";
-                    else if (faceTagString.match(faceTagEastRegex)) direction = "East";
-                    else if (faceTagString.match(faceTagDownRegex)) direction = "Down";
-                    else if (faceTagString.match(faceTagUpRegex)) direction = "Up";
-
-                    arrDisplays.push({ string: faceTagString, direction: direction });
-                }
-            }
-
-            faceTagDisplay = {
-                header: faceTagSubStr[0],
-                faceTagsKey: faceTagSubStr[1],
-                faceTags: arrDisplays,
-                faceTagsFooter: faceTagSubStr[3],
-                footer: faceTagSubStr[4],
-            }
-        }
-
-        // Gather pattern display data for this shape.
-        let patterns: patternDisplay[] = [];
-        if (subStr[2]) {
-            let patternStrings = subStr[2].split(patternObjDelimiterRegex);
-
-            for (let i = 0; i < patternStrings.length; i++) {
-                let patternSubStr = patternStrings[i].split(rulesKeyRegex);
-
-                // Gather rule display data for this pattern.
-                let rules: ruleDisplay[] = [];
-                if (patternSubStr[2]) {
-                    let ruleStrings = patternSubStr[2].split(ruleObjDelimiterRegex);
-
-                    for (let i = 0; i < ruleStrings.length; i++) {
-                        rules.push({ string: ruleStrings[i], object: JSON.parse(ruleStrings[i]) })
-                    }
-                }
-
-                // Build pattern display type after Gathering rules (or skipping them).
-                patterns[i] = {
-                    header: patternSubStr[0],
-                    rulesKey: patternSubStr[1],
-                    rules: rules,
-                    rulesFooter: patternSubStr[3],
-                    footer: patternSubStr[4]
-                };
-            }
-        };
-
-        // Build shape display type from our above data.
-        return {
-            header: faceTagDisplay, 
-            patternsKey: subStr[1],
-            patterns: patterns,
-            patternsFooter: subStr[3], 
-            footer: subStr[4]
-        };
-    }
-
-    const shapeString = getShapeString();
     return (
         <>
             <p id="json-display-title">Shape JSON view</p>
             <div id="json-display">
-                {shapeString.header.header}
-                {shapeString.header.faceTagsKey}
-                {shapeString.header.faceTags.map((data, index) => { // Create face tag elements colored as their direction.
-                    let isLast = index == (shapeString.header.faceTags.length - 1);
-                    let comma = isLast ? "" : ",";
-
-                    return <i className={`face-tag-${data.direction.toLowerCase()}`}>{data.string}{comma}</i>
-                })}
-                {shapeString.header.faceTagsFooter}
-                {shapeString.header.footer}
-                {shapeString.patternsKey}
-                {shapeString.patterns.map((pattern, index) => { // Create clickable pattern elements to aid navigation in a user friendly way.
-                    let isLast = index == (shapeString.patterns.length - 1);
-                    let activeSuffix = (index == patternIndex ? " active" : "");
-                    let comma = isLast ? "" : ",";
-                    let title = `Click me to see pattern ${index + 1}`;
-                    
-                    return <i className={"pattern-str" + activeSuffix} title={title} onClick={() => patternClicked(index)}>
-                        {pattern.header}
-                        {pattern.rulesKey}
-                        {pattern.rules.map((data, index) => { // Create rule elements based on the rule's inclusive or exclusive nature.
-                            let isLast = index == (pattern.rules.length - 1);
-                            let className = "rule-str";
-                            let comma = isLast ? "" : ",";
-
-                            if (data.object.IncludeOrExclude !== undefined) {
-                                switch (data.object.IncludeOrExclude) {
-                                    case "Exclude": className = "rule-exclude-str"; break;
-                                    case "Include": className = "rule-include-str"; break;
-                                }
-                            }
-
-                            return <i className={className}>{data.string}{comma}</i>
-                        })}
-                        {pattern.rulesFooter}
-                        {pattern.footer}
-
-                        {comma}
-                    </i>
-                })}
-                {shapeString.patternsFooter}
-                {shapeString.footer}
+                {"{"}
+                <FaceTagList content={shapeObj.FaceTags} flush={false} highlight={true} />
+                <PatternList patternClicked={patternClicked} patterns={shapeObj.PatternsToMatchAnyOf} activeIndex={patternIndex} />
+                {"}"}
             </div>
         </>
     )
 }
+
 
 export {
     NumberField,
