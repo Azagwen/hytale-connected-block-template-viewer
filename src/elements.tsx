@@ -133,6 +133,8 @@ function JsonFileField({ changedCallback }: JsonFieldSettings) {
     )
 }
 
+// section: JSON display elements begin
+
 type KeyedStringListSettings = {
     listKey: string;
     list: string[] | undefined;
@@ -328,6 +330,7 @@ function JsonDisplay({ patternClicked, content, shape, patternIndex }: JsonDispl
     )
 }
 
+// section ends: JSON display elements
 
 export {
     NumberField,

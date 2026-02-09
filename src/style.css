@@ -388,7 +388,7 @@ main {
 [class*="face-tag-"] {
    display: block;
    font-style: normal;
-   margin-bottom: 2px;
+   margin-bottom: 2px !important;
 }
 
 [class*="face-tag-"]:last-of-type {
