@@ -1,15 +1,40 @@
 import type * as Schema from "./@types/custom_connected_block_template";
 import React, { useState, type ChangeEvent } from "react";
 
-//TODO: Figure out how to dispatch events to the THREEjs Scene from React
-//      - Update: this is nearly done, the UI reacts to itself beautifully atm, but still no scene updates
-
 function FaRegularIcon({ iconName }: { iconName: string }) {
     return <i className={`icon fa-regular fa-${iconName}`}></i>
 }
 
 function FaSolidIcon({ iconName }: { iconName: string }) {
     return <i className={`icon fa-solid fa-${iconName}`}></i>
+}
+
+type FieldContainerFieldSettings = {
+    title: string
+    contents: React.JSX.Element;
+}
+
+function FieldContainerField({ title, contents }: FieldContainerFieldSettings) {
+    const [open, setOpen] = useState(false)
+    const closedIcon = <FaSolidIcon iconName="caret-right" />;
+    const openIcon = <FaSolidIcon iconName="caret-down" />;
+
+    const toggleDetails = (event: React.ToggleEvent<HTMLDetailsElement>) => {
+        setOpen(event.newState === "open");
+    }
+
+    const getIcon = () => open ? openIcon : closedIcon;
+
+    return (
+        <div className="field-container">
+            <details onToggle={toggleDetails}>
+                <summary className="field">{getIcon()}{title}</summary>
+            </details>
+            <div>
+                {contents}
+            </div>
+        </div>
+    )
 }
 
 type NumberFieldSettings = {
@@ -59,7 +84,7 @@ function CheckBoxField({ changedCallback, label, value }: CheckBoxFieldSettings)
     const getIcon = () => checked ? onIcon : offIcon;
     const toggle = (event: ChangeEvent<HTMLInputElement>) => {
         setChecked(event.target.checked);
-        changedCallback(checked);
+        changedCallback(event.target.checked);
     };
     
     return (
@@ -177,13 +202,11 @@ function FaceTagList({ content, flush, highlight }: FaceTagBlockSettings) {
     const tagsObj = (content as any);
 
     const keys = ["North", "South", "West", "East", "Down", "Up"];
-    const foundKeys = keys.map((key) => {
-        if (key in content) return key;
-    });
+    const foundKeys = keys.map((key) => { if (key in content) return key }).filter((item) => { if (item !== undefined) return item }); // Help
     const entries = foundKeys.map((key, index) => {
         if (!key) return (<></>);
         let isLast = (index == (foundKeys.length - 1));
-        let clazz = highlight ? `face-tag-${key.toLowerCase()} ` : "";
+        let clazz = highlight ? `face-tag-${key.toLowerCase()} ` : "face-tag";
 
         return <KeyedStringList listKey={key!} list={tagsObj[key!]} classes={[clazz]} addComma={!isLast} flush={false} />;
     });
@@ -210,7 +233,7 @@ function PatternRuleBlock({ rule, addComma, highlight = true }: PatternRuleBlock
     let className = "rule-str";
     if (rule.IncludeOrExclude === "Include") className = "rule-include-str";
     if (rule.IncludeOrExclude === "Exclude") className = "rule-exclude-str";
-    if (!highlight) className = "";
+    if (!highlight) className = "rule-disabled-str";
 
     return (
         <li className={`${className} indent-block`}>
@@ -235,15 +258,16 @@ function PatternRuleBlock({ rule, addComma, highlight = true }: PatternRuleBlock
 
 type PatternRuleListSettings = {
     rules: Schema.RuleToMatch[] | undefined;
+    highlight: boolean;
 }
 
-function PatternRuleList({ rules }: PatternRuleListSettings) {
+function PatternRuleList({ rules, highlight }: PatternRuleListSettings) {
     if (!rules) return (<></>);
 
     const entries = rules.map((rule, index) => {
         let isLast = (index == (rules.length - 1));
 
-        return <PatternRuleBlock rule={rule} addComma={!isLast} />
+        return <PatternRuleBlock rule={rule} addComma={!isLast} highlight={highlight} />
     })
 
     return (
@@ -261,9 +285,10 @@ type PatternBlockSettings = {
     isLast: boolean;
     index: number;
     activeIndex: number;
+    highlightRules: boolean;
 }
 
-function PatternBlock({ patternClicked, pattern, isLast, index, activeIndex }: PatternBlockSettings) {
+function PatternBlock({ patternClicked, pattern, isLast, index, activeIndex, highlightRules }: PatternBlockSettings) {
     const comma = isLast ? "" : ",";
     const activeClass = (activeIndex == index) ? "active" : "";
 
@@ -275,7 +300,7 @@ function PatternBlock({ patternClicked, pattern, isLast, index, activeIndex }: P
                 "RequireFaceTagsMatchingRoll": {pattern.RequireFaceTagsMatchingRoll ? "true" : "false"}, <br />
                 "TransformRulesToOrientation": {pattern.TransformRulesToOrientation ? "true" : "false"}, <br />
                 "YawToApplyAddReplacedBlockType": "{pattern.YawToApplyAddReplacedBlockType}", <br />
-                <PatternRuleList rules={pattern.RulesToMatch} />
+                <PatternRuleList rules={pattern.RulesToMatch} highlight={highlightRules} />
             </section>
             {"}"}{comma}
         </section>
@@ -286,15 +311,16 @@ type PatternListSettings = {
     patternClicked: (index: number) => {};
     patterns: Schema.Pattern[] | undefined
     activeIndex: number;
+    highlightRules: boolean;
 }
 
-function PatternList({ patternClicked, patterns, activeIndex }: PatternListSettings) {
+function PatternList({ patternClicked, patterns, activeIndex, highlightRules }: PatternListSettings) {
     if (!patterns) return (<></>);
 
     const entries = patterns.map((pattern, index) => {
         let isLast = (index == (patterns.length - 1));
 
-        return <PatternBlock patternClicked={patternClicked} pattern={pattern} isLast={isLast} index={index} activeIndex={activeIndex} />;
+        return <PatternBlock patternClicked={patternClicked} pattern={pattern} isLast={isLast} index={index} activeIndex={activeIndex} highlightRules={highlightRules} />;
     })
         
     return (
@@ -312,9 +338,11 @@ type JsonDisplaySettings = {
     content: Schema.CustomConnectedBlockTemplateAsset;
     shape: string;
     patternIndex: number;
+    highlightTags: boolean;
+    highlightRules: boolean;
 }
 
-function JsonDisplay({ patternClicked, content, shape, patternIndex }: JsonDisplaySettings) {
+function JsonDisplay({ patternClicked, content, shape, patternIndex, highlightTags, highlightRules }: JsonDisplaySettings) {
     const shapeObj: Schema.Shape = content.Shapes ? content.Shapes![shape] : {};
 
     return (
@@ -322,8 +350,8 @@ function JsonDisplay({ patternClicked, content, shape, patternIndex }: JsonDispl
             <p id="json-display-title">Shape JSON view</p>
             <div id="json-display">
                 {"{"}
-                <FaceTagList content={shapeObj.FaceTags} flush={false} highlight={true} />
-                <PatternList patternClicked={patternClicked} patterns={shapeObj.PatternsToMatchAnyOf} activeIndex={patternIndex} />
+                <FaceTagList content={shapeObj.FaceTags} flush={false} highlight={highlightTags} />
+                <PatternList patternClicked={patternClicked} patterns={shapeObj.PatternsToMatchAnyOf} activeIndex={patternIndex} highlightRules={highlightRules} />
                 {"}"}
             </div>
         </>
@@ -337,5 +365,6 @@ export {
     CheckBoxField,
     OptionsField,
     JsonFileField,
-    JsonDisplay
+    JsonDisplay,
+    FieldContainerField
 }
