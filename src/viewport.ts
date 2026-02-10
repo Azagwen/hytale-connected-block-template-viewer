@@ -13,10 +13,10 @@ const color_z_neg = 0xFFFF8F;
 // Face Texture
 // const tex_up = ObjUtils.textTexture("UP");
 // const tex_down = ObjUtils.textTexture("DOWN");
-const tex_north = ObjUtils.textTexture("NORTH", "#4F4F4F", "#FFFF8F");
-const tex_south = ObjUtils.textTexture("SOUTH", "#4F4F4F", "#8F8FFF");
-const tex_east = ObjUtils.textTexture("EAST", "#4F4F4F", "#FF8F8F");
-const tex_west = ObjUtils.textTexture("WEST", "#4F4F4F", "#8FFFFF");
+const tex_north = ObjUtils.textTexture("NORTH", "#384a72", "#FFFF8F");
+const tex_south = ObjUtils.textTexture("SOUTH", "#384a72", "#8F8FFF");
+const tex_east = ObjUtils.textTexture("EAST", "#384a72", "#FF8F8F");
+const tex_west = ObjUtils.textTexture("WEST", "#384a72", "#8FFFFF");
 
 const sceneObjects = {
     floorPlanes: new Array<THREE.Mesh>(),
@@ -109,11 +109,11 @@ const sceneObjects = {
             ObjUtils.makePlane(false, new THREE.Vector3( 0, 0,  1), rotation, size, 0xFFFFFF, tex_south, tex_south),
             ObjUtils.makePlane(false, new THREE.Vector3(-1, 0,  0), rotation, size, 0xFFFFFF, tex_west, tex_west),
             ObjUtils.makePlane(false, new THREE.Vector3( 1, 0,  0), rotation, size, 0xFFFFFF, tex_east, tex_east),
-            ObjUtils.makePlane(false, new THREE.Vector3(-1, 0, -1), rotation, size, 0x3F3F3F),
-            ObjUtils.makePlane(false, new THREE.Vector3( 1, 0, -1), rotation, size, 0x3F3F3F),
-            ObjUtils.makePlane(false, new THREE.Vector3( 0, 0,  0), rotation, size, 0x3F3F3F),
-            ObjUtils.makePlane(false, new THREE.Vector3(-1, 0,  1), rotation, size, 0x3F3F3F),
-            ObjUtils.makePlane(false, new THREE.Vector3( 1, 0,  1), rotation, size, 0x3F3F3F)
+            ObjUtils.makePlane(false, new THREE.Vector3(-1, 0, -1), rotation, size, 0x1E324B),
+            ObjUtils.makePlane(false, new THREE.Vector3( 1, 0, -1), rotation, size, 0x1E324B),
+            ObjUtils.makePlane(false, new THREE.Vector3( 0, 0,  0), rotation, size, 0x1E324B),
+            ObjUtils.makePlane(false, new THREE.Vector3(-1, 0,  1), rotation, size, 0x1E324B),
+            ObjUtils.makePlane(false, new THREE.Vector3( 1, 0,  1), rotation, size, 0x1E324B)
         );
     },
     makeShapeLabel: function(position: THREE.Vector3, label: string) {
@@ -145,7 +145,7 @@ class ViewportScene extends THREE.Scene {
         let canvas = document.getElementById("viewport") as HTMLCanvasElement;
         this.canvas = canvas;
         this.renderer = new THREE.WebGLRenderer( {antialias: true, canvas} );
-        this.renderer.setClearColor(0x777777);
+        this.renderer.setClearColor("#101720");
 
         // Camera setup
         let camParams = { size: 1, near: 0.1, far: 50 };

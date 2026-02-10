@@ -1,25 +1,29 @@
 :root {
-   --global-bg-dark: #666;
-   --global-bg: #aaa;
-   --button-bg: #fff;
-   --button-bg-hover: #e8e8e8;
-   --button-bg-pressed: #ddd;
-   --button-bg-pressed-hover: #eee;
+   --global-bg: #151f2c;
+   --button-bg: #384a72;
+   --button-bg-hover: #4e6597;
+   --button-bg-pressed: #384a7279;
+   --button-bg-pressed-hover: #384a72;
 
-   --rule-none: rgba(255, 255, 128, 0.5);
-   --rule-exclude: rgba(255, 128, 128, 0.5);
-   --rule-include: rgba(96, 223, 96, 0.5);
+   --button-label-bg: #1e324b;
+   --button-text: #9fb3ca;
+   --button-text-lighter: #cde4ff;
+   --button-corners: 4px;
 
-   --rule-none-idle: rgba(255, 255, 128, 0.25);
-   --rule-exclude-idle: rgba(255, 128, 128, 0.25);
-   --rule-include-idle: rgba(96, 223, 96, 0.25);
+   --rule-none: rgba(255, 255, 128, 0.333);
+   --rule-exclude: rgba(255, 128, 128, 0.333);
+   --rule-include: rgba(96, 223, 96, 0.333);
 
-   --facetag-north: rgba(255, 255, 128, 0.5);
-   --facetag-south: rgba(128, 128, 255, 0.5);
-   --facetag-west: rgba(128, 255, 255, 0.5);
-   --facetag-east: rgba(255, 128, 128, 0.5);
-   --facetag-down: rgba(255, 128, 255, 0.5);
-   --facetag-up: rgba(96, 223, 96, 0.5);;
+   --rule-none-idle: rgba(255, 255, 128, 0.333);
+   --rule-exclude-idle: rgba(255, 128, 128, 0.333);
+   --rule-include-idle: rgba(96, 223, 96, 0.333);
+
+   --facetag-north: rgba(255, 255, 128, 0.333);
+   --facetag-south: rgba(128, 128, 255, 0.333);
+   --facetag-west: rgba(128, 255, 255, 0.333);
+   --facetag-east: rgba(255, 128, 128, 0.333);
+   --facetag-down: rgba(255, 128, 255, 0.333);
+   --facetag-up: rgba(96, 223, 96, 0.333);
 
    --padding-1: 1vh;
    --padding-2: 2vh;
@@ -32,6 +36,7 @@
    --header-height: 7.5vh;
 
    --controls-width: 30vw;
+   --half-button-width: 50%;
 }
 
 html, body {
@@ -47,28 +52,31 @@ html, body {
 h1 {
    display: flex;
    margin: 0;
-   font-family:  AzaFont;
-   font-size: larger;
-   color: var(--global-bg-dark);
+   /* font-family:  AzaFont; */
    justify-content: space-between;
    align-items: center;
    padding-left: var(--padding-2);
    height: var(--header-height);
+   background-color: var(--button-label-bg);
+
+   color: var(--button-text);
+   font-family: 'Lexend', sans-serif;
+   font-weight: 700;
 }
 
 h1 > a {
    margin: 0;
-   border-left: #777 solid 1px;
    text-decoration: none;
-   color: var(--global-bg-dark);
-   background-color: var(--button-bg-pressed);
+   color: var(--button-text);
+   background-color: var(--button-bg);
+   border: var(--button-bg-hover) solid var(--button-corners);
    height: 100%;
    align-content: center;
    padding: 0 var(--padding-2);
+   box-sizing: border-box;
 }
 
 h1 > a:hover {
-   color: black;
    background-color: var(--button-bg-hover);
 }
 
@@ -114,15 +122,11 @@ main {
 .json-input {
    height: 100%;
    flex:1;
-   border-right: var(--global-bg) solid 1px;
-
-   font-family: "Noto Sans Mono", monospace;
-   font-optical-sizing: auto;
-   font-size: small;
-   font-weight: 400;
-   font-style: normal;
-   font-variation-settings:
-     "wdth" 62.5;
+   border-right: var(--global-bg) solid var(--small-padding);
+   
+   color: var(--button-text);
+   font-family: 'Lexend', sans-serif;
+   font-weight: 700;
 }
 
 .json-input::file-selector-button {
@@ -131,21 +135,16 @@ main {
    border-radius: 0;
    border: none;
    cursor: pointer;
-   border-right: var(--global-bg) var(--padding-1) solid;
    padding: var(--padding-1);
    background-color: var(--button-bg);
    margin-right: var(--padding-1);
-   border-right: var(--global-bg) solid 1px;
+   border-right: var(--global-bg) solid var(--small-padding);
    text-overflow: clip;
    overflow: hidden;
-
-   font-family: "Noto Sans Mono", monospace;
-   font-optical-sizing: auto;
-   font-size: small;
-   font-weight: 400;
-   font-style: normal;
-   font-variation-settings:
-     "wdth" 62.5;
+   
+   color: var(--button-text);
+   font-family: 'Lexend', sans-serif;
+   font-weight: 700;
 }
 
 .json-reload-button
@@ -157,58 +156,63 @@ main {
    background-color: var(--button-bg);
    cursor: pointer;
    padding: 0;
-   color: black;
+
+   color: var(--button-text);
 }
 
 .field {
    height: var(--button-height);
-   background-color: var(--button-bg);
+   background-color: var(--button-label-bg);
    margin-bottom: var(--small-padding);
+   border-radius: var(--button-corners);
 
-   font-family: "Noto Sans Mono", monospace;
-   font-optical-sizing: auto;
-   font-size: small;
-   font-weight: 400;
-   font-style: normal;
-   font-variation-settings:
-     "wdth" 62.5;
+   color: var(--button-text);
+   font-family: 'Lexend', sans-serif;
+   font-weight: 700;
 }
 
 .field:last-child {
    margin-bottom: 0;
 }
 
-.select-field {
-   display: flex;  
-   align-items: center;
+.select-field {  
+   display: flex;
+   flex-direction: row;
    justify-content: space-between;
+   align-items: center;
+   overflow: hidden;
 }
 
 .select-field-input {
    height: 100%;
-   width: 100%;
+   width: calc(var(--half-button-width) + var(--small-padding));
    border-radius: 0;
    border: none;
-   cursor: pointer;
-   padding: var(--padding-1);
-   flex-grow: 1;
-   border-left: var(--global-bg) solid 1px;
+   cursor: pointer;  
+   align-content: center;  
+   border-left: var(--global-bg) solid var(--small-padding);
    background-color: var(--button-bg);
    text-overflow: clip;
    overflow: hidden;
+   border-radius: 0px var(--button-corners) var(--button-corners) 0px;
+   padding: 0 var(--padding-1);
+
+   color: var(--button-text);
+   font-family: 'Lexend', sans-serif;
+   font-weight: 700;
 }
 
-.select-field-title {
-   height: 100%;
-   width: 100%;
+.select-field-title {  
+   flex-grow: 1;
    padding-left: var(--padding-1);
-   align-content: center;
    text-overflow: clip;
    overflow: hidden;
+   background-color: var(--button-label-bg);
+   height: 100%;
+   align-content: center;
 }
 
 .field-container > summary:hover,
-.pattern-str:hover,
 .json-reload-button:hover,
 .select-field-input:hover,
 .number-field > div > button:hover ,
@@ -245,7 +249,7 @@ main {
    margin: var(--padding-1);
    padding: var(--padding-1);
    white-space: pre;
-   background-color: var(--button-bg);
+   background-color: var(--button-label-bg);
 
    font-family: "Noto Sans Mono", monospace;
    font-optical-sizing: auto;
@@ -254,6 +258,8 @@ main {
    font-style: normal;
    font-variation-settings:
      "wdth" 62.5;
+   
+   color: var(--button-text);
 }
 
 #json-display-title {
@@ -261,8 +267,10 @@ main {
    margin-top: var(--padding-2);
    padding-left: var(--padding-1);
    padding-right: var(--padding-1);
-   padding-top: var(--padding-1);
-   border-top: #777 solid var(--small-padding);
+
+   color: var(--button-text);
+   font-family: 'Lexend', sans-serif;
+   font-weight: 700;
 }
 
 .checkbox-field {
@@ -285,7 +293,7 @@ main {
    display: block;
    height: 100%;
    width: 100%;
-   background-color: var(--button-bg);
+   background-color: var(--button-label-bg);
    align-content: center;
    text-overflow: clip;
    overflow: hidden;
@@ -303,7 +311,8 @@ main {
    display: flex;
    justify-content: stretch;
    height: 100%;
-   width: 50%;
+   width: var(--half-button-width);
+   border-left: var(--global-bg) solid var(--small-padding);
 }
 
 .number-field > label {
@@ -311,6 +320,9 @@ main {
    padding-left: var(--padding-1);
    text-overflow: clip;
    overflow: hidden;
+   background-color: var(--button-label-bg);
+   height: 100%;
+   align-content: center;
 }
 
 .number-field > div > button {
@@ -321,6 +333,12 @@ main {
    background-color: var(--button-bg);
    border-left: var(--global-bg) solid 1px;
    padding: 0;
+   
+   color: var(--button-text);
+}
+
+.number-field > div > button:first-child {
+   border-left: none;
 }
 
 .number-field > div > input[type="number"] {
@@ -330,7 +348,12 @@ main {
    border: none;
    cursor: pointer;
    border-left: var(--global-bg) solid 1px;
+   background-color: var(--button-bg);
    -moz-appearance: textfield;
+
+   color: var(--button-text);
+   font-family: 'Lexend', sans-serif;
+   font-weight: 700;
 }
 
 .number-field > div > input[type="number"]:focus-visible {
@@ -346,11 +369,17 @@ main {
 }
 
 .pattern-str {
-   background-color: var(--button-bg);
-   border: var(--button-bg-pressed) solid 1px;
+   background-color: var(--button-label-bg);
+   border: var(--button-bg) solid 2px;
    margin-bottom: var(--small-padding) !important;
    font-style: normal;
    cursor: pointer;
+   border-radius: var(--button-corners);
+}
+
+.pattern-str:hover {
+   background-color: var(--button-bg-pressed-hover);
+   border: var(--button-bg-pressed-hover) solid 2px;
 }
 
 .pattern-str:last-child {
@@ -359,33 +388,34 @@ main {
 
 .pattern-str.active {
    background-color: var(--button-bg-pressed);
-   border: var(--button-bg-pressed) solid 1px;
+   border: var(--button-bg-pressed) solid 2px;
 }
 
 .pattern-str.active:hover {
    background-color: var(--button-bg-pressed-hover);
-   border: var(--button-bg-pressed-hover) solid 1px;
+   border: var(--button-bg-pressed-hover) solid 2px;
 }
 
-.rule-str,
-.rule-disabled-str,
-.rule-include-str,
-.rule-exclude-str
-{
+[class*="rule-"] {
    margin-bottom: var(--small-padding) !important;
    font-style: normal;
+   color: var(--button-text);
+   border-radius: var(--button-corners);
 }
 
 .rule-str {
-   background-color: var(--rule-none-idle);
+   background: linear-gradient(90deg, var(--rule-none-idle) 0%, #0000 100%);
+   color: var(--button-text-lighter);
 }
 
 .rule-include-str {
-   background-color: var(--rule-include-idle);
+   background: linear-gradient(90deg, var(--rule-include-idle) 0%, #0000 100%);
+   color: var(--button-text-lighter);
 }
 
 .rule-exclude-str {
-   background-color: var(--rule-exclude-idle);
+   background: linear-gradient(90deg, var(--rule-exclude-idle) 0%, #0000 100%);
+   color: var(--button-text-lighter);
 }
 
 .pattern-str.active > .rule-str {
@@ -416,6 +446,7 @@ main {
    display: block;
    font-style: normal;
    margin-bottom: var(--small-padding) !important;
+   border-radius: var(--button-corners);
 }
 
 [class*="face-tag"]:last-of-type {
@@ -423,22 +454,28 @@ main {
 }
 
 .face-tag-north {
-   background-color: var(--facetag-north);
+   background: linear-gradient(90deg, var(--facetag-north) 0%, #0000 100%);
+   color: var(--button-text-lighter);
 }
 .face-tag-south {
-   background-color: var(--facetag-south);
+   background: linear-gradient(90deg, var(--facetag-south) 0%, #0000 100%);
+   color: var(--button-text-lighter);
 }
 .face-tag-west {
-   background-color: var(--facetag-west);
+   background: linear-gradient(90deg, var(--facetag-west) 0%, #0000 100%);
+   color: var(--button-text-lighter);
 }
 .face-tag-east {
-   background-color: var(--facetag-east);
+   background: linear-gradient(90deg, var(--facetag-east) 0%, #0000 100%);
+   color: var(--button-text-lighter);
 }
 .face-tag-down {
-   background-color: var(--facetag-down);
+   background: linear-gradient(90deg, var(--facetag-down) 0%, #0000 100%);
+   color: var(--button-text-lighter);
 }
 .face-tag-up {
-   background-color: var(--facetag-up);
+   background: linear-gradient(90deg, var(--facetag-up) 0%, #0000 100%);
+   color: var(--button-text-lighter);
 }
 
 .field-container > details ~ div {
@@ -450,16 +487,17 @@ main {
    transition: max-height 125ms ease-in-out, padding-top 125ms ease-in-out, padding-bottom 125ms ease-in-out;
    max-height: 0;
    overflow: hidden;
-   border: var(--button-bg) var(--small-padding) solid;
+   border: var(--button-label-bg) var(--small-padding) solid;
    border-bottom: none;
    border-top: none;
+   border-radius: 0px 0px var(--button-corners) var(--button-corners);
 }
 
 .field-container > details[open=""] ~ div {
    padding-top: var(--small-padding);
    padding-bottom: var(--small-padding);
    max-height: calc(calc(var(--button-height) * 4) + calc(var(--padding-1) * 4));
-   border-bottom: var(--button-bg) var(--small-padding) solid;
+   border-bottom: var(--button-label-bg) var(--small-padding) solid;
 }
 
 .field-container > details > summary {
@@ -471,6 +509,10 @@ main {
    overflow: hidden;
 }
 
+.field-container > details[open=""] > summary {  
+   border-radius: var(--button-corners) var(--button-corners) 0px 0px;
+}
+
 .field .icon {
    width: var(--button-height);
    height: var(--button-height);
@@ -479,7 +521,6 @@ main {
    align-items: center;
    --fa-display: inline-flex;
    justify-content: center;
-   border-right: var(--global-bg) solid 1px;
    margin-right: var(--padding-1);
 }
 
