@@ -3,5 +3,5 @@ A simple tool to visualize how a connected block template JSON from Hytale's ass
 
 Can be accessed at https://hycopat.azagwen.art/
 
-<img width="1822" height="1080" alt="image" src="https://github.com/user-attachments/assets/17b26053-5b57-4a92-acd3-e136319b0adf" />
+<img width="1821" height="1080" alt="image" src="https://github.com/user-attachments/assets/47af3c83-94b3-4adb-8a84-0baca7f8ca62" />
 
